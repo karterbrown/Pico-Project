@@ -44,10 +44,8 @@
    - Speaker → SPK+/SPK-
 
 7. **Connect SV5W triggers (Pico to SV5W)**
-   - GP6 (Pin 9) → I02
-   - GP7 (Pin 10) → I03
-   - GP8 (Pin 11) → I04
-   - GP9 (Pin 12) → I05
+   - GP4 (Pin 6) → I01/RX (UART receive)
+   - GP5 (Pin 7) → I00/TX (UART transmit)
    - GP10 (Pin 14) → Busy (optional but recommended)
 
 8. **Connect Button**
@@ -98,13 +96,16 @@
 
 ## Phase 3: Music Preparation 🎵
 
-### Choose Your Track
-- [ ] Select song for light show
+### Choose Your Tracks
+- [ ] Select songs for light show (as many as you want!)
 - [ ] Load into Pro Tools (or your DAW)
-- [ ] Convert to MP3 and name: `0001.mp3`
-- [ ] Copy to SV5W SD card
+- [ ] Convert to MP3 format
+- [ ] Name sequentially: `0001.mp3`, `0002.mp3`, `0003.mp3`, etc.
+- [ ] Copy all to SV5W SD card root directory
 
-### Mark Events
+**Note:** With UART mode, you can have dozens or hundreds of tracks! Each can have its own choreographed light show.
+
+### Mark Events (For Each Track)
 Open your DAW and mark significant events:
 - Intro/starts
 - Beat drops
@@ -112,6 +113,8 @@ Open your DAW and mark significant events:
 - Build-ups
 - Breaks/quiet parts
 - Ending
+
+**Repeat this process for each song you want to choreograph!**
 
 ### Export Timecode List
 For each marked event, note:
@@ -122,39 +125,58 @@ Example:
 132,300 samples ÷ 44,100 = 3.000 seconds
 ```
 
-### Create Event List
-Format:
+### Create Event Lists
+Format for each track:
 ```
+=== TRACK 1: "Funky Beat.mp3" ===
 0.000 - Track starts (fade in, soft blue)
 2.456 - First beat (flash white)
 5.123 - Verse starts (gentle pulse red)
 8.789 - Build up (intensity increases)
 12.345 - Drop (strobe + rainbow)
 ...etc
+
+=== TRACK 2: "Chill Vibes.mp3" ===
+0.000 - Intro (slow rainbow)
+3.210 - Melody enters (wave effect)
+...etc
+
+=== TRACK 3: "Epic Drop.mp3" ===
+0.000 - Build tension (pulse increasing)
+12.345 - Massive drop (full strobe)
+...etc
 ```
 
-Send this list = Ready for programming! 📝
+Send all your track lists = Ready for programming! 📝
 
 ---
 
 ## Phase 4: Programming Light Show 💻
 
 ### What I'll Build For You:
-1. **Cue Engine** - Reads your timecode list, triggers effects at exact moments
-2. **Effect Library** - Pre-made effects:
+1. **SV5W UART Library** - Serial communication for full player control
+2. **Cue Engine** - Reads your timecode lists, triggers effects at exact moments
+3. **Effect Library** - Pre-made effects:
    - Solid colors
    - Pulse/fade
    - Flash/strobe
    - Chase/wave
    - Rainbow
    - Custom combinations
-3. **Track Manager** - Handles multiple songs with different cue lists
-4. **Button Control** - Start/stop, track selection
+4. **Track Manager** - Handles multiple songs with different cue lists
+5. **Random Selector** - Button picks random track from your library
+6. **Choreography Mapper** - Links each track number to its light show
 
 ### Your Part:
-- Provide timecode list with descriptions
+- Provide timecode lists with descriptions for each track
 - Test and give feedback
 - Request adjustments
+
+### How It Works:
+- Press button → Random track chosen (e.g., track 47)
+- Pico sends UART command: "Play track 47"
+- Pico looks up choreography for track 47
+- Perfect sync! Audio + lights matched! 🎵💡
 
 ---
 
@@ -208,8 +230,7 @@ Send this list = Ready for programming! 📝
 - `./deploy.sh "message"` - Commit & push changes
 
 **Diagrams:**
-- WIRING_BUILD_DIAGRAM.drawio - Main build reference
-- WIRING_DIAGRAM.drawio - Detailed connections
+- WIRING_BUILD_DIAGRAM.drawio - Main build reference (UART mode for unlimited tracks)
 
 ---
 

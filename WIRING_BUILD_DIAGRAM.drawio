@@ -7,7 +7,7 @@
         <mxCell id="title" parent="1" style="text;html=1;align=center;verticalAlign=middle;fontSize=26;fontStyle=1;fontColor=#1A1A1A;" value="BUILD DIAGRAM - 100 LED SYSTEM WITH CENTRAL DISTRIBUTION BOARD" vertex="1">
           <mxGeometry height="50" width="1800" x="300" y="30" as="geometry" />
         </mxCell>
-        <mxCell id="subtitle" parent="1" style="text;html=1;align=center;verticalAlign=middle;fontSize=16;fontStyle=0;fontColor=#666666;" value="Production Build with PCB Distribution Board &amp; Power Switch" vertex="1">
+        <mxCell id="subtitle" parent="1" style="text;html=1;align=center;verticalAlign=middle;fontSize=16;fontStyle=0;fontColor=#666666;" value="Production Build with PCB Distribution Board, Power Switch &amp; UART Audio Control (Unlimited Tracks)" vertex="1">
           <mxGeometry height="30" width="1800" x="300" y="85" as="geometry" />
         </mxCell>
         <mxCell id="psu-box" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;strokeWidth=4;fontSize=16;fontStyle=1;verticalAlign=top;spacing=10;" value="BTF-LIGHTING POWER SUPPLY" vertex="1">
@@ -94,8 +94,8 @@
         <mxCell id="pico-box" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;strokeWidth=4;fontSize=15;fontStyle=1;verticalAlign=top;spacing=8;" value="RASPBERRY PI PICO" vertex="1">
           <mxGeometry height="420" width="460" x="240" y="1050" as="geometry" />
         </mxCell>
-        <mxCell id="pico-note" parent="1" style="text;html=1;align=center;verticalAlign=middle;fontSize=11;fontStyle=2;fontColor=#52b346;" value="Connect to PCB for power,&#xa;direct wiring for control signals" vertex="1">
-          <mxGeometry height="35" width="200" x="260" y="1085" as="geometry" />
+        <mxCell id="pico-note" parent="1" style="text;html=1;align=center;verticalAlign=middle;fontSize=11;fontStyle=2;fontColor=#52b346;" value="Connect to PCB for power,&#xa;UART serial for audio control,&#xa;direct wiring for LED data signals" vertex="1">
+          <mxGeometry height="45" width="220" x="260" y="1080" as="geometry" />
         </mxCell>
         <mxCell id="pico-vbus-conn" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6e6;strokeColor=#CC0000;strokeWidth=2;fontSize=11;fontStyle=1;" value="VBUS → +5V Rail" vertex="1">
           <mxGeometry height="35" width="120" x="260" y="1130" as="geometry" />
@@ -121,23 +121,17 @@
         <mxCell id="pico-gp11" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#cce5ff;strokeColor=#0066CC;strokeWidth=2;fontSize=11;fontStyle=1;" value="GP11 → Strip 5" vertex="1">
           <mxGeometry height="30" width="100" x="260" y="1420" as="geometry" />
         </mxCell>
-        <mxCell id="pico-audio-label" parent="1" style="text;html=1;align=left;verticalAlign=middle;fontSize=12;fontStyle=1;fontColor=#9673A6;" value="AUDIO PINS:" vertex="1">
+        <mxCell id="pico-audio-label" parent="1" style="text;html=1;align=left;verticalAlign=middle;fontSize=12;fontStyle=1;fontColor=#9673A6;" value="AUDIO UART:" vertex="1">
           <mxGeometry height="25" width="120" x="400" y="1230" as="geometry" />
         </mxCell>
-        <mxCell id="pico-gp6" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f3e5f5;strokeColor=#9673A6;strokeWidth=2;fontSize=11;fontStyle=1;" value="GP6 → I02" vertex="1">
-          <mxGeometry height="30" width="85" x="400" y="1260" as="geometry" />
+        <mxCell id="pico-gp4" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f3e5f5;strokeColor=#9673A6;strokeWidth=2;fontSize=11;fontStyle=1;" value="GP4 TX → RX" vertex="1">
+          <mxGeometry height="30" width="100" x="400" y="1260" as="geometry" />
         </mxCell>
-        <mxCell id="pico-gp7" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f3e5f5;strokeColor=#9673A6;strokeWidth=2;fontSize=11;fontStyle=1;" value="GP7 → I03" vertex="1">
-          <mxGeometry height="30" width="85" x="400" y="1300" as="geometry" />
-        </mxCell>
-        <mxCell id="pico-gp8" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f3e5f5;strokeColor=#9673A6;strokeWidth=2;fontSize=11;fontStyle=1;" value="GP8 → I04" vertex="1">
-          <mxGeometry height="30" width="85" x="400" y="1340" as="geometry" />
-        </mxCell>
-        <mxCell id="pico-gp9" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f3e5f5;strokeColor=#9673A6;strokeWidth=2;fontSize=11;fontStyle=1;" value="GP9 → I05" vertex="1">
-          <mxGeometry height="30" width="85" x="400" y="1380" as="geometry" />
+        <mxCell id="pico-gp5" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f3e5f5;strokeColor=#9673A6;strokeWidth=2;fontSize=11;fontStyle=1;" value="GP5 RX → TX" vertex="1">
+          <mxGeometry height="30" width="100" x="400" y="1300" as="geometry" />
         </mxCell>
         <mxCell id="pico-gp10" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f3e5f5;strokeColor=#9673A6;strokeWidth=2;fontSize=11;fontStyle=1;" value="GP10 → Busy" vertex="1">
-          <mxGeometry height="30" width="85" x="400" y="1420" as="geometry" />
+          <mxGeometry height="30" width="100" x="400" y="1340" as="geometry" />
         </mxCell>
         <mxCell id="pico-button-label" parent="1" style="text;html=1;align=left;verticalAlign=middle;fontSize=12;fontStyle=1;fontColor=#B85450;" value="BUTTON:" vertex="1">
           <mxGeometry height="25" width="80" x="520" y="1230" as="geometry" />
@@ -214,7 +208,7 @@
         <mxCell id="sv5w-box" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;strokeWidth=4;fontSize=15;fontStyle=1;verticalAlign=top;spacing=8;" value="SV5W MP3 MODULE" vertex="1">
           <mxGeometry height="340" width="260" x="800" y="1050" as="geometry" />
         </mxCell>
-        <mxCell id="sv5w-note" parent="1" style="text;html=1;align=center;verticalAlign=middle;fontSize=11;fontStyle=2;fontColor=#9673A6;" value="Connect to PCB for power" vertex="1">
+        <mxCell id="sv5w-note" parent="1" style="text;html=1;align=center;verticalAlign=middle;fontSize=11;fontStyle=2;fontColor=#9673A6;" value="UART Mode - Unlimited Tracks" vertex="1">
           <mxGeometry height="20" width="220" x="820" y="1085" as="geometry" />
         </mxCell>
         <mxCell id="sv5w-vcc-conn" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6e6;strokeColor=#CC0000;strokeWidth=2;fontSize=11;fontStyle=1;" value="VCC → +5V Rail" vertex="1">
@@ -223,23 +217,17 @@
         <mxCell id="sv5w-gnd-conn" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#4d4d4d;strokeColor=#000000;strokeWidth=2;fontSize=11;fontStyle=1;fontColor=#FFFFFF;" value="GND → GND Rail" vertex="1">
           <mxGeometry height="30" width="110" x="820" y="1155" as="geometry" />
         </mxCell>
-        <mxCell id="sv5w-trig-label" parent="1" style="text;html=1;align=left;verticalAlign=middle;fontSize=11;fontStyle=1;" value="TRIGGER INPUTS:" vertex="1">
+        <mxCell id="sv5w-uart-label" parent="1" style="text;html=1;align=left;verticalAlign=middle;fontSize=11;fontStyle=1;" value="UART SERIAL:" vertex="1">
           <mxGeometry height="20" width="140" x="820" y="1200" as="geometry" />
         </mxCell>
-        <mxCell id="sv5w-i02" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f3e5f5;strokeColor=#9673A6;strokeWidth=2;fontSize=10;fontStyle=1;" value="I02 ← GP6" vertex="1">
-          <mxGeometry height="25" width="75" x="820" y="1225" as="geometry" />
+        <mxCell id="sv5w-rx" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f3e5f5;strokeColor=#9673A6;strokeWidth=2;fontSize=10;fontStyle=1;" value="I01/RX ← GP4" vertex="1">
+          <mxGeometry height="25" width="95" x="820" y="1225" as="geometry" />
         </mxCell>
-        <mxCell id="sv5w-i03" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f3e5f5;strokeColor=#9673A6;strokeWidth=2;fontSize=10;fontStyle=1;" value="I03 ← GP7" vertex="1">
-          <mxGeometry height="25" width="75" x="910" y="1225" as="geometry" />
+        <mxCell id="sv5w-tx" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f3e5f5;strokeColor=#9673A6;strokeWidth=2;fontSize=10;fontStyle=1;" value="I00/TX → GP5" vertex="1">
+          <mxGeometry height="25" width="95" x="925" y="1225" as="geometry" />
         </mxCell>
-        <mxCell id="sv5w-i04" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f3e5f5;strokeColor=#9673A6;strokeWidth=2;fontSize=10;fontStyle=1;" value="I04 ← GP8" vertex="1">
-          <mxGeometry height="25" width="75" x="820" y="1258" as="geometry" />
-        </mxCell>
-        <mxCell id="sv5w-i05" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f3e5f5;strokeColor=#9673A6;strokeWidth=2;fontSize=10;fontStyle=1;" value="I05 ← GP9" vertex="1">
-          <mxGeometry height="25" width="75" x="910" y="1258" as="geometry" />
-        </mxCell>
-        <mxCell id="sv5w-busy" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f3e5f5;strokeColor=#9673A6;strokeWidth=2;fontSize=10;fontStyle=1;" value="Busy ← GP10" vertex="1">
-          <mxGeometry height="25" width="85" x="865" y="1291" as="geometry" />
+        <mxCell id="sv5w-busy" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f3e5f5;strokeColor=#9673A6;strokeWidth=2;fontSize=10;fontStyle=1;" value="Busy → GP10" vertex="1">
+          <mxGeometry height="25" width="95" x="870" y="1258" as="geometry" />
         </mxCell>
         <mxCell id="sv5w-spk" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff9c4;strokeColor=#F9A825;strokeWidth=2;fontSize=11;fontStyle=1;" value="SPEAKER OUTPUT&#xa;SPK+ / SPK-" vertex="1">
           <mxGeometry height="40" width="130" x="860" y="1340" as="geometry" />
@@ -387,7 +375,7 @@
             <mxPoint x="750" y="1150" as="targetPoint" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="wire-pico-sv5w-audio-label" connectable="0" parent="wire-pico-sv5w-audio" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=10;fontStyle=1;fontColor=#9673A6;labelBackgroundColor=#FFFFFF;" value="5× Jumpers&#xa;(GP6-10)" vertex="1">
+        <mxCell id="wire-pico-sv5w-audio-label" connectable="0" parent="wire-pico-sv5w-audio" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=10;fontStyle=1;fontColor=#9673A6;labelBackgroundColor=#FFFFFF;" value="3× UART Wires&#xa;(GP4,5,10)" vertex="1">
           <mxGeometry relative="1" x="-0.3" y="1" as="geometry">
             <mxPoint x="126" y="-90" as="offset" />
           </mxGeometry>
