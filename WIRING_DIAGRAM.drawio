@@ -1,0 +1,586 @@
+<mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36" version="29.6.4">
+  <diagram name="Wiring Diagram" id="wiring-complete">
+    <mxGraphModel dx="1113" dy="689" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="2200" pageHeight="1500" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="title" parent="1" style="text;html=1;align=center;verticalAlign=middle;fontSize=26;fontStyle=1;fontColor=#1A1A1A;" value="RASPBERRY PI PICO - 100 LED SYSTEM WIRING DIAGRAM" vertex="1">
+          <mxGeometry height="50" width="1400" x="400" y="30" as="geometry" />
+        </mxCell>
+        <mxCell id="psu-box" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;strokeWidth=4;fontSize=16;fontStyle=1;verticalAlign=top;spacing=10;" value="BTF-LIGHTING POWER SUPPLY" vertex="1">
+          <mxGeometry height="160" width="400" x="880" y="120" as="geometry" />
+        </mxCell>
+        <mxCell id="psu-label" parent="1" style="text;html=1;align=center;verticalAlign=middle;fontSize=13;fontStyle=0;" value="AC 100-240V Input → DC 5V 10A Max 50W" vertex="1">
+          <mxGeometry height="25" width="300" x="930" y="155" as="geometry" />
+        </mxCell>
+        <mxCell id="psu-plus-term" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffcccc;strokeColor=#CC0000;strokeWidth=3;fontSize=14;fontStyle=1;" value="+5V OUTPUT" vertex="1">
+          <mxGeometry height="60" width="130" x="940" y="200" as="geometry" />
+        </mxCell>
+        <mxCell id="psu-gnd-term" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#333333;strokeColor=#000000;strokeWidth=3;fontSize=14;fontStyle=1;fontColor=#FFFFFF;" value="GND OUTPUT" vertex="1">
+          <mxGeometry height="60" width="130" x="1110" y="200" as="geometry" />
+        </mxCell>
+        <mxCell id="pico-box" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;strokeWidth=4;fontSize=16;fontStyle=1;verticalAlign=top;spacing=10;" value="RASPBERRY PI PICO" vertex="1">
+          <mxGeometry height="480" width="600" x="400" y="400" as="geometry" />
+        </mxCell>
+        <mxCell id="pico-vbus-box" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6e6;strokeColor=#CC0000;strokeWidth=2;fontSize=11;fontStyle=1;" value="VBUS (Pin 40)" vertex="1">
+          <mxGeometry height="35" width="80" x="840" y="430" as="geometry" />
+        </mxCell>
+        <mxCell id="pico-gnd38-box" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#4d4d4d;strokeColor=#000000;strokeWidth=2;fontSize=11;fontStyle=1;fontColor=#FFFFFF;" value="GND (Pin 38)" vertex="1">
+          <mxGeometry height="35" width="80" x="900" y="475" as="geometry" />
+        </mxCell>
+        <mxCell id="label-led-pins" parent="1" style="text;html=1;align=left;verticalAlign=middle;fontSize=12;fontStyle=1;fontColor=#0066CC;" value="LED CONTROL PINS:" vertex="1">
+          <mxGeometry height="25" width="150" x="420" y="440" as="geometry" />
+        </mxCell>
+        <mxCell id="pico-gp0" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#cce5ff;strokeColor=#0066CC;strokeWidth=2;fontSize=11;fontStyle=1;" value="GP0 (Pin 1)" vertex="1">
+          <mxGeometry height="35" width="85" x="420" y="470" as="geometry" />
+        </mxCell>
+        <mxCell id="pico-gp1" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#cce5ff;strokeColor=#0066CC;strokeWidth=2;fontSize=11;fontStyle=1;" value="GP1 (Pin 2)" vertex="1">
+          <mxGeometry height="35" width="85" x="420" y="515" as="geometry" />
+        </mxCell>
+        <mxCell id="pico-gp2" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#cce5ff;strokeColor=#0066CC;strokeWidth=2;fontSize=11;fontStyle=1;" value="GP2 (Pin 4)" vertex="1">
+          <mxGeometry height="35" width="85" x="420" y="560" as="geometry" />
+        </mxCell>
+        <mxCell id="pico-gp3" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#cce5ff;strokeColor=#0066CC;strokeWidth=2;fontSize=11;fontStyle=1;" value="GP3 (Pin 5)" vertex="1">
+          <mxGeometry height="35" width="85" x="420" y="605" as="geometry" />
+        </mxCell>
+        <mxCell id="pico-gp11" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#cce5ff;strokeColor=#0066CC;strokeWidth=2;fontSize=11;fontStyle=1;" value="GP11 (Pin 15)" vertex="1">
+          <mxGeometry height="35" width="85" x="420" y="650" as="geometry" />
+        </mxCell>
+        <mxCell id="label-audio-pins" parent="1" style="text;html=1;align=left;verticalAlign=middle;fontSize=12;fontStyle=1;fontColor=#9673A6;" value="AUDIO TRIGGER PINS:" vertex="1">
+          <mxGeometry height="25" width="180" x="420" y="720" as="geometry" />
+        </mxCell>
+        <mxCell id="pico-gp6" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f3e5f5;strokeColor=#9673A6;strokeWidth=2;fontSize=11;fontStyle=1;" value="GP6 (Pin 9)" vertex="1">
+          <mxGeometry height="35" width="85" x="860" y="672.5" as="geometry" />
+        </mxCell>
+        <mxCell id="pico-gp7" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f3e5f5;strokeColor=#9673A6;strokeWidth=2;fontSize=11;fontStyle=1;" value="GP7 (Pin 10)" vertex="1">
+          <mxGeometry height="35" width="85" x="860" y="715" as="geometry" />
+        </mxCell>
+        <mxCell id="pico-gp8" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f3e5f5;strokeColor=#9673A6;strokeWidth=2;fontSize=11;fontStyle=1;" value="GP8 (Pin 11)" vertex="1">
+          <mxGeometry height="35" width="85" x="860" y="760" as="geometry" />
+        </mxCell>
+        <mxCell id="pico-gp9" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f3e5f5;strokeColor=#9673A6;strokeWidth=2;fontSize=11;fontStyle=1;" value="GP9 (Pin 12)" vertex="1">
+          <mxGeometry height="35" width="85" x="860" y="800" as="geometry" />
+        </mxCell>
+        <mxCell id="pico-gp10" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f3e5f5;strokeColor=#9673A6;strokeWidth=2;fontSize=11;fontStyle=1;" value="GP10 (Pin 14)" vertex="1">
+          <mxGeometry height="35" width="85" x="860" y="630" as="geometry" />
+        </mxCell>
+        <mxCell id="label-button-pin" parent="1" style="text;html=1;align=left;verticalAlign=middle;fontSize=12;fontStyle=1;fontColor=#B85450;" value="BUTTON PIN:" vertex="1">
+          <mxGeometry height="25" width="120" x="860" y="520" as="geometry" />
+        </mxCell>
+        <mxCell id="pico-gp15" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#B85450;strokeWidth=2;fontSize=11;fontStyle=1;" value="GP15 (Pin 20)" vertex="1">
+          <mxGeometry height="35" width="85" x="860" y="545" as="geometry" />
+        </mxCell>
+        <mxCell id="pico-gnd23" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#4d4d4d;strokeColor=#000000;strokeWidth=2;fontSize=11;fontStyle=1;fontColor=#FFFFFF;" value="GND (Pin 23)" vertex="1">
+          <mxGeometry height="35" width="85" x="860" y="585" as="geometry" />
+        </mxCell>
+        <mxCell id="strip1-box" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;strokeWidth=3;fontSize=13;fontStyle=1;verticalAlign=top;spacing=8;" value="STRIP 1&#xa;(20 LEDs)" vertex="1">
+          <mxGeometry height="120" width="140" x="200" y="1020" as="geometry" />
+        </mxCell>
+        <mxCell id="strip1-din" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#cce5ff;strokeColor=#0066CC;strokeWidth=2;fontSize=11;fontStyle=1;" value="DIN" vertex="1">
+          <mxGeometry height="30" width="45" x="220" y="1060" as="geometry" />
+        </mxCell>
+        <mxCell id="strip1-5v" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#ffcccc;strokeColor=#CC0000;strokeWidth=2;fontSize=11;fontStyle=1;" value="5V" vertex="1">
+          <mxGeometry height="30" width="45" x="275" y="1060" as="geometry" />
+        </mxCell>
+        <mxCell id="strip1-gnd" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#4d4d4d;strokeColor=#000000;strokeWidth=2;fontSize=11;fontStyle=1;fontColor=#FFFFFF;" value="GND" vertex="1">
+          <mxGeometry height="30" width="45" x="247.5" y="1100" as="geometry" />
+        </mxCell>
+        <mxCell id="strip2-box" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;strokeWidth=3;fontSize=13;fontStyle=1;verticalAlign=top;spacing=8;" value="STRIP 2&#xa;(20 LEDs)" vertex="1">
+          <mxGeometry height="120" width="140" x="380" y="1020" as="geometry" />
+        </mxCell>
+        <mxCell id="strip2-din" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#cce5ff;strokeColor=#0066CC;strokeWidth=2;fontSize=11;fontStyle=1;" value="DIN" vertex="1">
+          <mxGeometry height="30" width="45" x="400" y="1060" as="geometry" />
+        </mxCell>
+        <mxCell id="strip2-5v" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#ffcccc;strokeColor=#CC0000;strokeWidth=2;fontSize=11;fontStyle=1;" value="5V" vertex="1">
+          <mxGeometry height="30" width="45" x="455" y="1060" as="geometry" />
+        </mxCell>
+        <mxCell id="strip2-gnd" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#4d4d4d;strokeColor=#000000;strokeWidth=2;fontSize=11;fontStyle=1;fontColor=#FFFFFF;" value="GND" vertex="1">
+          <mxGeometry height="30" width="45" x="427.5" y="1100" as="geometry" />
+        </mxCell>
+        <mxCell id="strip3-box" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;strokeWidth=3;fontSize=13;fontStyle=1;verticalAlign=top;spacing=8;" value="STRIP 3&#xa;(20 LEDs)" vertex="1">
+          <mxGeometry height="120" width="140" x="560" y="1020" as="geometry" />
+        </mxCell>
+        <mxCell id="strip3-din" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#cce5ff;strokeColor=#0066CC;strokeWidth=2;fontSize=11;fontStyle=1;" value="DIN" vertex="1">
+          <mxGeometry height="30" width="45" x="580" y="1060" as="geometry" />
+        </mxCell>
+        <mxCell id="strip3-5v" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#ffcccc;strokeColor=#CC0000;strokeWidth=2;fontSize=11;fontStyle=1;" value="5V" vertex="1">
+          <mxGeometry height="30" width="45" x="635" y="1060" as="geometry" />
+        </mxCell>
+        <mxCell id="strip3-gnd" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#4d4d4d;strokeColor=#000000;strokeWidth=2;fontSize=11;fontStyle=1;fontColor=#FFFFFF;" value="GND" vertex="1">
+          <mxGeometry height="30" width="45" x="607.5" y="1100" as="geometry" />
+        </mxCell>
+        <mxCell id="strip4-box" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;strokeWidth=3;fontSize=13;fontStyle=1;verticalAlign=top;spacing=8;" value="STRIP 4&#xa;(20 LEDs)" vertex="1">
+          <mxGeometry height="120" width="140" x="740" y="1020" as="geometry" />
+        </mxCell>
+        <mxCell id="strip4-din" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#cce5ff;strokeColor=#0066CC;strokeWidth=2;fontSize=11;fontStyle=1;" value="DIN" vertex="1">
+          <mxGeometry height="30" width="45" x="760" y="1060" as="geometry" />
+        </mxCell>
+        <mxCell id="strip4-5v" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#ffcccc;strokeColor=#CC0000;strokeWidth=2;fontSize=11;fontStyle=1;" value="5V" vertex="1">
+          <mxGeometry height="30" width="45" x="815" y="1060" as="geometry" />
+        </mxCell>
+        <mxCell id="strip4-gnd" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#4d4d4d;strokeColor=#000000;strokeWidth=2;fontSize=11;fontStyle=1;fontColor=#FFFFFF;" value="GND" vertex="1">
+          <mxGeometry height="30" width="45" x="787.5" y="1100" as="geometry" />
+        </mxCell>
+        <mxCell id="strip5-box" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;strokeWidth=3;fontSize=13;fontStyle=1;verticalAlign=top;spacing=8;" value="STRIP 5&#xa;(20 LEDs)" vertex="1">
+          <mxGeometry height="120" width="140" x="920" y="1020" as="geometry" />
+        </mxCell>
+        <mxCell id="strip5-din" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#cce5ff;strokeColor=#0066CC;strokeWidth=2;fontSize=11;fontStyle=1;" value="DIN" vertex="1">
+          <mxGeometry height="30" width="45" x="940" y="1060" as="geometry" />
+        </mxCell>
+        <mxCell id="strip5-5v" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#ffcccc;strokeColor=#CC0000;strokeWidth=2;fontSize=11;fontStyle=1;" value="5V" vertex="1">
+          <mxGeometry height="30" width="45" x="995" y="1060" as="geometry" />
+        </mxCell>
+        <mxCell id="strip5-gnd" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#4d4d4d;strokeColor=#000000;strokeWidth=2;fontSize=11;fontStyle=1;fontColor=#FFFFFF;" value="GND" vertex="1">
+          <mxGeometry height="30" width="45" x="967.5" y="1100" as="geometry" />
+        </mxCell>
+        <mxCell id="sv5w-box" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;strokeWidth=3;fontSize=14;fontStyle=1;verticalAlign=top;spacing=8;" value="SV5W MP3 MODULE" vertex="1">
+          <mxGeometry height="432.5" width="250" x="1280" y="487.5" as="geometry" />
+        </mxCell>
+        <mxCell id="sv5w-label-pwr" parent="1" style="text;html=1;align=left;verticalAlign=middle;fontSize=11;fontStyle=1;" value="POWER:" vertex="1">
+          <mxGeometry height="20" width="80" x="1300" y="522.5" as="geometry" />
+        </mxCell>
+        <mxCell id="sv5w-vcc" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#ffcccc;strokeColor=#CC0000;strokeWidth=2;fontSize=11;fontStyle=1;" value="VCC" vertex="1">
+          <mxGeometry height="32" width="55" x="1300" y="547.5" as="geometry" />
+        </mxCell>
+        <mxCell id="sv5w-gnd" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#4d4d4d;strokeColor=#000000;strokeWidth=2;fontSize=11;fontStyle=1;fontColor=#FFFFFF;" value="GND" vertex="1">
+          <mxGeometry height="32" width="55" x="1370" y="547.5" as="geometry" />
+        </mxCell>
+        <mxCell id="sv5w-label-trig" parent="1" style="text;html=1;align=left;verticalAlign=middle;fontSize=11;fontStyle=1;" value="TRIGGER INPUTS:" vertex="1">
+          <mxGeometry height="20" width="150" x="1300" y="597.5" as="geometry" />
+        </mxCell>
+        <mxCell id="sv5w-i02" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#f3e5f5;strokeColor=#9673A6;strokeWidth=2;fontSize=11;fontStyle=1;" value="I02" vertex="1">
+          <mxGeometry height="32" width="55" x="1300" y="667.5" as="geometry" />
+        </mxCell>
+        <mxCell id="sv5w-i03" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#f3e5f5;strokeColor=#9673A6;strokeWidth=2;fontSize=11;fontStyle=1;" value="I03" vertex="1">
+          <mxGeometry height="32" width="55" x="1300" y="711.5" as="geometry" />
+        </mxCell>
+        <mxCell id="sv5w-i04" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#f3e5f5;strokeColor=#9673A6;strokeWidth=2;fontSize=11;fontStyle=1;" value="I04" vertex="1">
+          <mxGeometry height="32" width="55" x="1300" y="752.5" as="geometry" />
+        </mxCell>
+        <mxCell id="sv5w-i05" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#f3e5f5;strokeColor=#9673A6;strokeWidth=2;fontSize=11;fontStyle=1;" value="I05" vertex="1">
+          <mxGeometry height="32" width="55" x="1300" y="791.5" as="geometry" />
+        </mxCell>
+        <mxCell id="sv5w-busy" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#f3e5f5;strokeColor=#9673A6;strokeWidth=2;fontSize=11;fontStyle=1;" value="Busy" vertex="1">
+          <mxGeometry height="32" width="55" x="1300" y="627.5" as="geometry" />
+        </mxCell>
+        <mxCell id="sv5w-label-out" parent="1" style="text;html=1;align=left;verticalAlign=middle;fontSize=11;fontStyle=1;" value="AUDIO OUTPUT:" vertex="1">
+          <mxGeometry height="20" width="150" x="1400" y="760" as="geometry" />
+        </mxCell>
+        <mxCell id="sv5w-spk" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff9c4;strokeColor=#F9A825;strokeWidth=2;fontSize=11;fontStyle=1;" value="SPEAKER&#xa;SPK+ / SPK-" vertex="1">
+          <mxGeometry height="50" width="110" x="1400" y="782.5" as="geometry" />
+        </mxCell>
+        <mxCell id="button-box" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;strokeWidth=3;fontSize=14;fontStyle=1;" value="BUTTON" vertex="1">
+          <mxGeometry height="80" width="120" x="1030" y="545" as="geometry" />
+        </mxCell>
+        <mxCell id="button-t1" parent="1" style="text;html=1;align=center;verticalAlign=middle;fontSize=11;fontStyle=1;" value="T1" vertex="1">
+          <mxGeometry height="20" width="30" x="1290" y="835" as="geometry" />
+        </mxCell>
+        <mxCell id="button-t2" parent="1" style="text;html=1;align=center;verticalAlign=middle;fontSize=11;fontStyle=1;" value="T2" vertex="1">
+          <mxGeometry height="20" width="30" x="1290" y="870" as="geometry" />
+        </mxCell>
+        <mxCell id="wire-psu-vbus" edge="1" parent="1" source="psu-plus-term" style="endArrow=classic;html=1;strokeColor=#CC0000;strokeWidth=4;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="pico-vbus-box" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <Array as="points">
+              <mxPoint x="1005" y="340" />
+              <mxPoint x="940" y="340" />
+            </Array>
+            <mxPoint x="1000" y="300" as="sourcePoint" />
+            <mxPoint x="1050" y="250" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="wire-psu-vbus-label" connectable="0" parent="wire-psu-vbus" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=10;fontStyle=1;fontColor=#CC0000;labelBackgroundColor=#FFFFFF;" value="18 AWG Red" vertex="1">
+          <mxGeometry relative="1" x="-0.3" y="2" as="geometry">
+            <mxPoint x="9" y="-22" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="wire-psu-gnd38" edge="1" parent="1" source="psu-gnd-term" style="endArrow=classic;html=1;strokeColor=#000000;strokeWidth=4;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="pico-gnd38-box" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <Array as="points">
+              <mxPoint x="1175" y="350" />
+              <mxPoint x="940" y="350" />
+            </Array>
+            <mxPoint x="1000" y="300" as="sourcePoint" />
+            <mxPoint x="1050" y="250" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="wire-psu-gnd38-label" connectable="0" parent="wire-psu-gnd38" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=10;fontStyle=1;fontColor=#000000;labelBackgroundColor=#FFFFFF;" value="18 AWG Black" vertex="1">
+          <mxGeometry relative="1" x="-0.3" y="2" as="geometry">
+            <mxPoint x="30" y="10" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="wire-psu-sv5w-vcc" edge="1" parent="1" source="psu-plus-term" style="endArrow=classic;html=1;strokeColor=#CC0000;strokeWidth=3;exitX=0.75;exitY=1;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;edgeStyle=orthogonalEdgeStyle;" target="sv5w-vcc" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <Array as="points">
+              <mxPoint x="1037" y="310" />
+              <mxPoint x="1250" y="310" />
+              <mxPoint x="1250" y="563" />
+            </Array>
+            <mxPoint x="1100" y="300" as="sourcePoint" />
+            <mxPoint x="1150" y="250" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="wire-psu-sv5w-vcc-label" connectable="0" parent="wire-psu-sv5w-vcc" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=10;fontStyle=1;fontColor=#CC0000;labelBackgroundColor=#FFFFFF;" value="22 AWG Red" vertex="1">
+          <mxGeometry relative="1" x="-0.8" y="1" as="geometry">
+            <mxPoint x="2" y="-10" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="wire-psu-sv5w-gnd" edge="1" parent="1" source="psu-gnd-term" style="endArrow=classic;html=1;strokeColor=#000000;strokeWidth=3;exitX=0.75;exitY=1;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;edgeStyle=orthogonalEdgeStyle;" target="sv5w-gnd" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <Array as="points">
+              <mxPoint x="1207" y="320" />
+              <mxPoint x="1550" y="320" />
+              <mxPoint x="1550" y="563" />
+            </Array>
+            <mxPoint x="1100" y="300" as="sourcePoint" />
+            <mxPoint x="1150" y="250" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="wire-psu-sv5w-gnd-label" connectable="0" parent="wire-psu-sv5w-gnd" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=10;fontStyle=1;fontColor=#000000;labelBackgroundColor=#FFFFFF;" value="22 AWG Black" vertex="1">
+          <mxGeometry relative="1" x="-0.8" y="1" as="geometry">
+            <mxPoint x="-6" y="-19" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="wire-psu-strips-5v-1" edge="1" parent="1" source="psu-plus-term" style="endArrow=classic;html=1;strokeColor=#CC0000;strokeWidth=3;exitX=0.25;exitY=1;exitDx=0;exitDy=0;edgeStyle=orthogonalEdgeStyle;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="strip1-5v" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <Array as="points">
+              <mxPoint x="973" y="300" />
+              <mxPoint x="120" y="300" />
+              <mxPoint x="120" y="1000" />
+              <mxPoint x="297" y="1000" />
+            </Array>
+            <mxPoint x="600" y="900" as="sourcePoint" />
+            <mxPoint x="120" y="1030" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="wire-psu-strips-gnd-1" edge="1" parent="1" source="psu-gnd-term" style="endArrow=classic;html=1;strokeColor=#000000;strokeWidth=3;exitX=0.25;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;edgeStyle=orthogonalEdgeStyle;" target="strip1-gnd" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <Array as="points">
+              <mxPoint x="1142" y="330" />
+              <mxPoint x="80" y="330" />
+              <mxPoint x="80" y="1200" />
+              <mxPoint x="270" y="1200" />
+            </Array>
+            <mxPoint x="600" y="900" as="sourcePoint" />
+            <mxPoint x="650" y="850" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="ground-bus-label" parent="1" style="text;html=1;align=center;verticalAlign=middle;fontSize=11;fontStyle=1;fontColor=#000000;labelBackgroundColor=#FFFFFF;" value="GND Bus (All Components)" vertex="1">
+          <mxGeometry height="25" width="190" x="80" y="1210" as="geometry" />
+        </mxCell>
+        <mxCell id="wire-gp0-strip1" edge="1" parent="1" source="pico-gp0" style="endArrow=classic;html=1;strokeColor=#0066CC;strokeWidth=2.5;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;edgeStyle=orthogonalEdgeStyle;" target="strip1-din" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <Array as="points">
+              <mxPoint x="243" y="488" />
+            </Array>
+            <mxPoint x="600" y="700" as="sourcePoint" />
+            <mxPoint x="650" y="650" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="wire-gp0-strip1-label" connectable="0" parent="wire-gp0-strip1" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=9;fontStyle=1;fontColor=#0066CC;labelBackgroundColor=#FFFFFF;" value="Data" vertex="1">
+          <mxGeometry relative="1" x="-0.85" y="1" as="geometry">
+            <mxPoint x="-10" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="wire-gp1-strip2" edge="1" parent="1" source="pico-gp1" style="endArrow=classic;html=1;strokeColor=#0066CC;strokeWidth=2.5;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;edgeStyle=orthogonalEdgeStyle;" target="strip2-din" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <Array as="points">
+              <mxPoint x="270" y="532" />
+              <mxPoint x="270" y="960" />
+              <mxPoint x="423" y="960" />
+            </Array>
+            <mxPoint x="600" y="700" as="sourcePoint" />
+            <mxPoint x="650" y="650" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="wire-gp2-strip3" edge="1" parent="1" source="pico-gp2" style="endArrow=classic;html=1;strokeColor=#0066CC;strokeWidth=2.5;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;edgeStyle=orthogonalEdgeStyle;" target="strip3-din" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <Array as="points">
+              <mxPoint x="300" y="578" />
+              <mxPoint x="300" y="940" />
+              <mxPoint x="603" y="940" />
+            </Array>
+            <mxPoint x="600" y="700" as="sourcePoint" />
+            <mxPoint x="650" y="650" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="wire-gp3-strip4" edge="1" parent="1" source="pico-gp3" style="endArrow=classic;html=1;strokeColor=#0066CC;strokeWidth=2.5;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;edgeStyle=orthogonalEdgeStyle;" target="strip4-din" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <Array as="points">
+              <mxPoint x="330" y="622" />
+              <mxPoint x="330" y="920" />
+              <mxPoint x="783" y="920" />
+            </Array>
+            <mxPoint x="600" y="700" as="sourcePoint" />
+            <mxPoint x="650" y="650" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="wire-gp11-strip5" edge="1" parent="1" source="pico-gp11" style="endArrow=classic;html=1;strokeColor=#0066CC;strokeWidth=2.5;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;edgeStyle=orthogonalEdgeStyle;" target="strip5-din" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <Array as="points">
+              <mxPoint x="360" y="668" />
+              <mxPoint x="360" y="900" />
+              <mxPoint x="963" y="900" />
+            </Array>
+            <mxPoint x="600" y="700" as="sourcePoint" />
+            <mxPoint x="650" y="650" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="wire-gp6-i02" edge="1" parent="1" source="pico-gp6" style="endArrow=classic;html=1;strokeColor=#9673A6;strokeWidth=2.5;exitX=1;exitY=0.5;exitDx=0;exitDy=0;edgeStyle=orthogonalEdgeStyle;" target="sv5w-i02" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <Array as="points">
+              <mxPoint x="1260" y="690" />
+              <mxPoint x="1260" y="690" />
+            </Array>
+            <mxPoint x="1100" y="700" as="sourcePoint" />
+            <mxPoint x="1150" y="650" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="wire-gp6-i02-label" connectable="0" parent="wire-gp6-i02" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=9;fontStyle=1;fontColor=#9673A6;labelBackgroundColor=#FFFFFF;" value="MP3-1" vertex="1">
+          <mxGeometry relative="1" x="-0.6" y="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="wire-gp7-i03" edge="1" parent="1" source="pico-gp7" style="endArrow=classic;html=1;strokeColor=#9673A6;strokeWidth=2.5;exitX=1;exitY=0.5;exitDx=0;exitDy=0;edgeStyle=orthogonalEdgeStyle;" target="sv5w-i03" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <Array as="points">
+              <mxPoint x="1280" y="733" />
+              <mxPoint x="1280" y="733" />
+            </Array>
+            <mxPoint x="1100" y="700" as="sourcePoint" />
+            <mxPoint x="1150" y="650" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="wire-gp7-i03-label" connectable="0" parent="wire-gp7-i03" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=9;fontStyle=1;fontColor=#9673A6;labelBackgroundColor=#FFFFFF;" value="MP3-2" vertex="1">
+          <mxGeometry relative="1" x="-0.6" y="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="wire-gp8-i04" edge="1" parent="1" source="pico-gp8" style="endArrow=classic;html=1;strokeColor=#9673A6;strokeWidth=2.5;exitX=1;exitY=0.5;exitDx=0;exitDy=0;edgeStyle=orthogonalEdgeStyle;" target="sv5w-i04" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <Array as="points">
+              <mxPoint x="1290" y="777" />
+              <mxPoint x="1290" y="777" />
+            </Array>
+            <mxPoint x="1100" y="700" as="sourcePoint" />
+            <mxPoint x="1150" y="650" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="wire-gp8-i04-label" connectable="0" parent="wire-gp8-i04" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=9;fontStyle=1;fontColor=#9673A6;labelBackgroundColor=#FFFFFF;" value="MP3-3" vertex="1">
+          <mxGeometry relative="1" x="-0.6" y="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="wire-gp9-i05" edge="1" parent="1" source="pico-gp9" style="endArrow=classic;html=1;strokeColor=#9673A6;strokeWidth=2.5;exitX=1;exitY=0.5;exitDx=0;exitDy=0;edgeStyle=orthogonalEdgeStyle;" target="sv5w-i05" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <Array as="points">
+              <mxPoint x="1300" y="817" />
+              <mxPoint x="1300" y="817" />
+            </Array>
+            <mxPoint x="1100" y="700" as="sourcePoint" />
+            <mxPoint x="1150" y="650" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="wire-gp9-i05-label" connectable="0" parent="wire-gp9-i05" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=9;fontStyle=1;fontColor=#9673A6;labelBackgroundColor=#FFFFFF;" value="MP3-4" vertex="1">
+          <mxGeometry relative="1" x="-0.6" y="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="wire-gp10-busy" edge="1" parent="1" source="pico-gp10" style="endArrow=classic;html=1;strokeColor=#9673A6;strokeWidth=2.5;exitX=1;exitY=0.5;exitDx=0;exitDy=0;edgeStyle=orthogonalEdgeStyle;" target="sv5w-busy" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <Array as="points">
+              <mxPoint x="1270" y="647" />
+              <mxPoint x="1270" y="647" />
+            </Array>
+            <mxPoint x="1100" y="700" as="sourcePoint" />
+            <mxPoint x="1150" y="650" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="wire-gp10-busy-label" connectable="0" parent="wire-gp10-busy" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=9;fontStyle=1;fontColor=#9673A6;labelBackgroundColor=#FFFFFF;" value="Status" vertex="1">
+          <mxGeometry relative="1" x="-0.6" y="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="wire-button-gp15" edge="1" parent="1" source="button-box" style="endArrow=classic;html=1;strokeColor=#B85450;strokeWidth=2.5;exitX=0;exitY=0.25;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;edgeStyle=orthogonalEdgeStyle;" target="pico-gp15" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <Array as="points">
+              <mxPoint x="1046" y="563" />
+              <mxPoint x="985" y="563" />
+            </Array>
+            <mxPoint x="1100" y="800" as="sourcePoint" />
+            <mxPoint x="1150" y="750" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="wire-button-gp15-label" connectable="0" parent="wire-button-gp15" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=9;fontStyle=1;fontColor=#B85450;labelBackgroundColor=#FFFFFF;" value="Signal" vertex="1">
+          <mxGeometry relative="1" x="-0.6" y="1" as="geometry">
+            <mxPoint x="10" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="wire-button-gnd" edge="1" parent="1" source="button-box" style="endArrow=classic;html=1;strokeColor=#000000;strokeWidth=2.5;exitX=0;exitY=0.75;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;edgeStyle=orthogonalEdgeStyle;" target="pico-gnd23" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <Array as="points">
+              <mxPoint x="1046" y="603" />
+              <mxPoint x="945" y="603" />
+            </Array>
+            <mxPoint x="1100" y="800" as="sourcePoint" />
+            <mxPoint x="1150" y="750" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="wire-button-gnd-label" connectable="0" parent="wire-button-gnd" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=9;fontStyle=1;fontColor=#000000;labelBackgroundColor=#FFFFFF;" value="GND" vertex="1">
+          <mxGeometry relative="1" x="-0.6" y="1" as="geometry">
+            <mxPoint x="10" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="legend-box" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F5F5F5;strokeColor=#666666;strokeWidth=2;fontSize=13;fontStyle=1;verticalAlign=top;align=left;spacing=10;" value="WIRE COLOR LEGEND" vertex="1">
+          <mxGeometry height="180" width="250" x="1280" y="1020" as="geometry" />
+        </mxCell>
+        <mxCell id="legend-5v" edge="1" parent="1" style="endArrow=none;html=1;strokeColor=#CC0000;strokeWidth=4;endFill=0;" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <mxPoint x="1300" y="1070" as="sourcePoint" />
+            <mxPoint x="1360" y="1070" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="legend-5v-text" parent="1" style="text;html=1;align=left;verticalAlign=middle;fontSize=11;" value="+5V Power (Red)" vertex="1">
+          <mxGeometry height="25" width="150" x="1370" y="1058" as="geometry" />
+        </mxCell>
+        <mxCell id="legend-gnd" edge="1" parent="1" style="endArrow=none;html=1;strokeColor=#000000;strokeWidth=4;endFill=0;" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <mxPoint x="1300" y="1100" as="sourcePoint" />
+            <mxPoint x="1360" y="1100" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="legend-gnd-text" parent="1" style="text;html=1;align=left;verticalAlign=middle;fontSize=11;" value="Ground (Black)" vertex="1">
+          <mxGeometry height="25" width="150" x="1370" y="1088" as="geometry" />
+        </mxCell>
+        <mxCell id="legend-data" edge="1" parent="1" style="endArrow=none;html=1;strokeColor=#0066CC;strokeWidth=3;endFill=0;" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <mxPoint x="1300" y="1130" as="sourcePoint" />
+            <mxPoint x="1360" y="1130" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="legend-data-text" parent="1" style="text;html=1;align=left;verticalAlign=middle;fontSize=11;" value="LED Data (Blue)" vertex="1">
+          <mxGeometry height="25" width="150" x="1370" y="1118" as="geometry" />
+        </mxCell>
+        <mxCell id="legend-audio" edge="1" parent="1" style="endArrow=none;html=1;strokeColor=#9673A6;strokeWidth=3;endFill=0;" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <mxPoint x="1300" y="1160" as="sourcePoint" />
+            <mxPoint x="1360" y="1160" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="legend-audio-text" parent="1" style="text;html=1;align=left;verticalAlign=middle;fontSize=11;" value="Audio Trigger (Purple)" vertex="1">
+          <mxGeometry height="25" width="160" x="1370" y="1148" as="geometry" />
+        </mxCell>
+        <mxCell id="notes-box" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF9E6;strokeColor=#F9A825;strokeWidth=2;fontSize=11;align=left;verticalAlign=top;spacing=10;" value="IMPORTANT NOTES:&#xa;• All GND connections must be common (connected together)&#xa;• Use 18 AWG wire for Pico power (VBUS/GND)&#xa;• Use 16-18 AWG for LED strip 5V and GND&#xa;• Use 22-24 AWG for data and audio signals&#xa;• Power supply rated 10A, system draws 6.6A max" vertex="1">
+          <mxGeometry height="150" width="250" x="1280" y="1240" as="geometry" />
+        </mxCell>
+        <mxCell id="uryWLSgO7b67bifgZiO2-8" edge="1" parent="1" source="psu-plus-term" style="endArrow=classic;html=1;strokeColor=#CC0000;strokeWidth=3;exitX=0.25;exitY=1;exitDx=0;exitDy=0;edgeStyle=orthogonalEdgeStyle;" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <Array as="points">
+              <mxPoint x="973" y="300" />
+              <mxPoint x="120" y="300" />
+              <mxPoint x="120" y="1000" />
+              <mxPoint x="297" y="1000" />
+            </Array>
+            <mxPoint x="973" y="260" as="sourcePoint" />
+            <mxPoint x="298" y="1060" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="uryWLSgO7b67bifgZiO2-9" edge="1" parent="1" source="psu-plus-term" style="endArrow=classic;html=1;strokeColor=#CC0000;strokeWidth=3;exitX=0.25;exitY=1;exitDx=0;exitDy=0;edgeStyle=orthogonalEdgeStyle;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="strip2-5v" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <Array as="points">
+              <mxPoint x="973" y="300" />
+              <mxPoint x="120" y="300" />
+              <mxPoint x="120" y="1000" />
+              <mxPoint x="477" y="1000" />
+            </Array>
+            <mxPoint x="973" y="260" as="sourcePoint" />
+            <mxPoint x="298" y="1060" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="uryWLSgO7b67bifgZiO2-10" edge="1" parent="1" source="psu-plus-term" style="endArrow=classic;html=1;strokeColor=#CC0000;strokeWidth=3;exitX=0.25;exitY=1;exitDx=0;exitDy=0;edgeStyle=orthogonalEdgeStyle;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="strip3-5v" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <Array as="points">
+              <mxPoint x="973" y="300" />
+              <mxPoint x="120" y="300" />
+              <mxPoint x="120" y="1000" />
+              <mxPoint x="657" y="1000" />
+            </Array>
+            <mxPoint x="973" y="260" as="sourcePoint" />
+            <mxPoint x="298" y="1060" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="uryWLSgO7b67bifgZiO2-11" edge="1" parent="1" source="psu-plus-term" style="endArrow=classic;html=1;strokeColor=#CC0000;strokeWidth=3;exitX=0.25;exitY=1;exitDx=0;exitDy=0;edgeStyle=orthogonalEdgeStyle;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="strip4-5v" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <Array as="points">
+              <mxPoint x="973" y="300" />
+              <mxPoint x="120" y="300" />
+              <mxPoint x="120" y="1000" />
+              <mxPoint x="837" y="1000" />
+            </Array>
+            <mxPoint x="973" y="260" as="sourcePoint" />
+            <mxPoint x="298" y="1060" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="uryWLSgO7b67bifgZiO2-12" edge="1" parent="1" source="psu-plus-term" style="endArrow=classic;html=1;strokeColor=#CC0000;strokeWidth=3;exitX=0.25;exitY=1;exitDx=0;exitDy=0;edgeStyle=orthogonalEdgeStyle;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="strip5-5v" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <Array as="points">
+              <mxPoint x="973" y="300" />
+              <mxPoint x="120" y="300" />
+              <mxPoint x="120" y="1000" />
+              <mxPoint x="1017" y="1000" />
+            </Array>
+            <mxPoint x="973" y="260" as="sourcePoint" />
+            <mxPoint x="298" y="1060" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="uryWLSgO7b67bifgZiO2-13" edge="1" parent="1" source="psu-gnd-term" style="endArrow=classic;html=1;strokeColor=#000000;strokeWidth=3;exitX=0.25;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;edgeStyle=orthogonalEdgeStyle;" target="strip2-gnd" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <Array as="points">
+              <mxPoint x="1143" y="330" />
+              <mxPoint x="80" y="330" />
+              <mxPoint x="80" y="1200" />
+              <mxPoint x="450" y="1200" />
+            </Array>
+            <mxPoint x="600" y="900" as="sourcePoint" />
+            <mxPoint x="650" y="850" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="uryWLSgO7b67bifgZiO2-14" edge="1" parent="1" source="psu-gnd-term" style="endArrow=classic;html=1;strokeColor=#000000;strokeWidth=3;exitX=0.25;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;edgeStyle=orthogonalEdgeStyle;" target="strip3-gnd" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <Array as="points">
+              <mxPoint x="1143" y="330" />
+              <mxPoint x="80" y="330" />
+              <mxPoint x="80" y="1200" />
+              <mxPoint x="630" y="1200" />
+            </Array>
+            <mxPoint x="600" y="900" as="sourcePoint" />
+            <mxPoint x="650" y="850" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="uryWLSgO7b67bifgZiO2-15" edge="1" parent="1" source="psu-gnd-term" style="endArrow=classic;html=1;strokeColor=#000000;strokeWidth=3;exitX=0.25;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;edgeStyle=orthogonalEdgeStyle;" target="strip4-gnd" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <Array as="points">
+              <mxPoint x="1143" y="330" />
+              <mxPoint x="80" y="330" />
+              <mxPoint x="80" y="1200" />
+              <mxPoint x="810" y="1200" />
+            </Array>
+            <mxPoint x="600" y="900" as="sourcePoint" />
+            <mxPoint x="650" y="850" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="uryWLSgO7b67bifgZiO2-16" edge="1" parent="1" source="psu-gnd-term" style="endArrow=classic;html=1;strokeColor=#000000;strokeWidth=3;exitX=0.25;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;edgeStyle=orthogonalEdgeStyle;" target="strip5-gnd" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <Array as="points">
+              <mxPoint x="1143" y="330" />
+              <mxPoint x="80" y="330" />
+              <mxPoint x="80" y="1200" />
+              <mxPoint x="990" y="1200" />
+            </Array>
+            <mxPoint x="600" y="900" as="sourcePoint" />
+            <mxPoint x="650" y="850" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
