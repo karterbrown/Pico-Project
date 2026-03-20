@@ -133,11 +133,26 @@
         <mxCell id="pico-gp10" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f3e5f5;strokeColor=#9673A6;strokeWidth=2;fontSize=11;fontStyle=1;" value="GP10 → Busy" vertex="1">
           <mxGeometry height="30" width="100" x="400" y="1340" as="geometry" />
         </mxCell>
-        <mxCell id="pico-button-label" parent="1" style="text;html=1;align=left;verticalAlign=middle;fontSize=12;fontStyle=1;fontColor=#B85450;" value="BUTTON:" vertex="1">
-          <mxGeometry height="25" width="80" x="520" y="1230" as="geometry" />
+        <mxCell id="pico-buttons-label" parent="1" style="text;html=1;align=left;verticalAlign=middle;fontSize=12;fontStyle=1;fontColor=#B85450;" value="BUTTONS (6):" vertex="1">
+          <mxGeometry height="25" width="120" x="520" y="1230" as="geometry" />
         </mxCell>
-        <mxCell id="pico-gp15" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#B85450;strokeWidth=2;fontSize=11;fontStyle=1;" value="GP15 → Btn" vertex="1">
-          <mxGeometry height="30" width="90" x="520" y="1260" as="geometry" />
+        <mxCell id="pico-gp15" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#B85450;strokeWidth=2;fontSize=10;fontStyle=1;" value="GP15 → B1" vertex="1">
+          <mxGeometry height="25" width="70" x="520" y="1260" as="geometry" />
+        </mxCell>
+        <mxCell id="pico-gp16" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#B85450;strokeWidth=2;fontSize=10;fontStyle=1;" value="GP16 → B2" vertex="1">
+          <mxGeometry height="25" width="70" x="600" y="1260" as="geometry" />
+        </mxCell>
+        <mxCell id="pico-gp17" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#B85450;strokeWidth=2;fontSize=10;fontStyle=1;" value="GP17 → B3" vertex="1">
+          <mxGeometry height="25" width="70" x="520" y="1295" as="geometry" />
+        </mxCell>
+        <mxCell id="pico-gp18" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#B85450;strokeWidth=2;fontSize=10;fontStyle=1;" value="GP18 → B4" vertex="1">
+          <mxGeometry height="25" width="70" x="600" y="1295" as="geometry" />
+        </mxCell>
+        <mxCell id="pico-gp19" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#B85450;strokeWidth=2;fontSize=10;fontStyle=1;" value="GP19 → B5" vertex="1">
+          <mxGeometry height="25" width="70" x="520" y="1330" as="geometry" />
+        </mxCell>
+        <mxCell id="pico-gp20" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#B85450;strokeWidth=2;fontSize=10;fontStyle=1;" value="GP20 → B6" vertex="1">
+          <mxGeometry height="25" width="70" x="600" y="1330" as="geometry" />
         </mxCell>
         <mxCell id="strips-area" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;strokeWidth=4;fontSize=15;fontStyle=1;verticalAlign=top;spacing=10;" value="LED STRIPS (5x 20 LEDs)" vertex="1">
           <mxGeometry height="420" width="700" x="1520" y="1050" as="geometry" />
@@ -230,13 +245,40 @@
           <mxGeometry height="25" width="95" x="870" y="1258" as="geometry" />
         </mxCell>
         <mxCell id="sv5w-spk" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff9c4;strokeColor=#F9A825;strokeWidth=2;fontSize=11;fontStyle=1;" value="SPEAKER OUTPUT&#xa;SPK+ / SPK-" vertex="1">
-          <mxGeometry height="40" width="130" x="860" y="1340" as="geometry" />
+          <mxGeometry height="40" width="130" x="860" y="1300" as="geometry" />
         </mxCell>
-        <mxCell id="button-box" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;strokeWidth=3;fontSize=14;fontStyle=1;" value="BUTTON" vertex="1">
-          <mxGeometry height="80" width="120" x="1180" y="1120" as="geometry" />
+        <mxCell id="sv5w-dipswitch-box" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFE6CC;strokeColor=#FF6B00;strokeWidth=3;fontSize=11;fontStyle=1;verticalAlign=top;spacing=8;" value="DIP SWITCH CONFIG" vertex="1">
+          <mxGeometry height="100" width="200" x="820" y="1360" as="geometry" />
         </mxCell>
-        <mxCell id="button-note" parent="1" style="text;html=1;align=center;verticalAlign=middle;fontSize=11;fontStyle=1;fontColor=#B85450;" value="T1 → GP15&#xa;T2 → GND Rail" vertex="1">
-          <mxGeometry height="40" width="120" x="1180" y="1210" as="geometry" />
+        <mxCell id="sv5w-dip-note" parent="1" style="text;html=1;align=left;verticalAlign=top;fontSize=9;" value="For UART mode, set:&#xa;SW1: ON (UART control)&#xa;SW2: OFF&#xa;SW3-8: Depends on model&#xa;(Consult SV5W manual)" vertex="1">
+          <mxGeometry height="70" width="180" x="830" y="1385" as="geometry" />
+        </mxCell>
+        <mxCell id="buttons-box" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;strokeWidth=4;fontSize=15;fontStyle=1;verticalAlign=top;spacing=10;" value="CONTROL BUTTONS (6)" vertex="1">
+          <mxGeometry height="340" width="280" x="1100" y="1050" as="geometry" />
+        </mxCell>
+        <mxCell id="btn-note" parent="1" style="text;html=1;align=center;verticalAlign=middle;fontSize=10;fontStyle=2;fontColor=#B85450;" value="All buttons: One side → GPIO, Other → GND Rail" vertex="1">
+          <mxGeometry height="30" width="240" x="1120" y="1085" as="geometry" />
+        </mxCell>
+        <mxCell id="btn1" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6e6;strokeColor=#b85450;strokeWidth=2;fontSize=10;fontStyle=1;" value="BTN 1 - Random&#xa;GP15 (Pin 20)" vertex="1">
+          <mxGeometry height="40" width="110" x="1125" y="1125" as="geometry" />
+        </mxCell>
+        <mxCell id="btn2" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6e6;strokeColor=#b85450;strokeWidth=2;fontSize=10;fontStyle=1;" value="BTN 2 - Next&#xa;GP16 (Pin 21)" vertex="1">
+          <mxGeometry height="40" width="110" x="1245" y="1125" as="geometry" />
+        </mxCell>
+        <mxCell id="btn3" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6e6;strokeColor=#b85450;strokeWidth=2;fontSize=10;fontStyle=1;" value="BTN 3 - Previous&#xa;GP17 (Pin 22)" vertex="1">
+          <mxGeometry height="40" width="110" x="1125" y="1180" as="geometry" />
+        </mxCell>
+        <mxCell id="btn4" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6e6;strokeColor=#b85450;strokeWidth=2;fontSize=10;fontStyle=1;" value="BTN 4 - Pause&#xa;GP18 (Pin 24)" vertex="1">
+          <mxGeometry height="40" width="110" x="1245" y="1180" as="geometry" />
+        </mxCell>
+        <mxCell id="btn5" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6e6;strokeColor=#b85450;strokeWidth=2;fontSize=10;fontStyle=1;" value="BTN 5 - Vol Up&#xa;GP19 (Pin 25)" vertex="1">
+          <mxGeometry height="40" width="110" x="1125" y="1235" as="geometry" />
+        </mxCell>
+        <mxCell id="btn6" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6e6;strokeColor=#b85450;strokeWidth=2;fontSize=10;fontStyle=1;" value="BTN 6 - Vol Down&#xa;GP20 (Pin 26)" vertex="1">
+          <mxGeometry height="40" width="110" x="1245" y="1235" as="geometry" />
+        </mxCell>
+        <mxCell id="btn-gnd-common" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#4d4d4d;strokeColor=#000000;strokeWidth=2;fontSize=11;fontStyle=1;fontColor=#FFFFFF;" value="All GND → GND Rail" vertex="1">
+          <mxGeometry height="35" width="230" x="1125" y="1295" as="geometry" />
         </mxCell>
         <mxCell id="wire-psu-switch" edge="1" parent="1" source="psu-plus" style="endArrow=classic;html=1;strokeColor=#CC0000;strokeWidth=5;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;edgeStyle=orthogonalEdgeStyle;" target="switch-box" value="">
           <mxGeometry height="50" relative="1" width="50" as="geometry">
@@ -380,23 +422,23 @@
             <mxPoint x="126" y="-90" as="offset" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="wire-pico-button" edge="1" parent="1" source="pico-gp15" style="endArrow=classic;html=1;strokeColor=#B85450;strokeWidth=2.5;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;edgeStyle=orthogonalEdgeStyle;dashed=1;" target="button-box" value="">
+        <mxCell id="wire-pico-buttons" edge="1" parent="1" source="pico-gp20" style="endArrow=classic;html=1;strokeColor=#B85450;strokeWidth=2.5;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;edgeStyle=orthogonalEdgeStyle;dashed=1;" target="buttons-box" value="">
           <mxGeometry height="50" relative="1" width="50" as="geometry">
             <Array as="points">
-              <mxPoint x="610" y="1420" />
-              <mxPoint x="1140" y="1420" />
-              <mxPoint x="1140" y="1160" />
+              <mxPoint x="690" y="1500" />
+              <mxPoint x="1060" y="1500" />
+              <mxPoint x="1060" y="1220" />
             </Array>
             <mxPoint x="700" y="1200" as="sourcePoint" />
             <mxPoint x="750" y="1150" as="targetPoint" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="wire-pico-button-label" connectable="0" parent="wire-pico-button" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=10;fontStyle=1;fontColor=#B85450;labelBackgroundColor=#FFFFFF;" value="Signal wire" vertex="1">
+        <mxCell id="wire-pico-buttons-label" connectable="0" parent="wire-pico-buttons" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=10;fontStyle=1;fontColor=#B85450;labelBackgroundColor=#FFFFFF;" value="6× Button wires&#xa;(GP15-20)" vertex="1">
           <mxGeometry relative="1" x="-0.3" y="1" as="geometry">
             <mxPoint x="10" as="offset" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="wire-button-pcb-gnd" edge="1" parent="1" source="button-box" style="endArrow=classic;html=1;strokeColor=#000000;strokeWidth=2.5;exitX=0.5;exitY=0;exitDx=0;exitDy=0;edgeStyle=orthogonalEdgeStyle;dashed=1;" value="">
+        <mxCell id="wire-buttons-pcb-gnd" edge="1" parent="1" source="btn-gnd-common" style="endArrow=classic;html=1;strokeColor=#000000;strokeWidth=2.5;exitX=0.5;exitY=0;exitDx=0;exitDy=0;edgeStyle=orthogonalEdgeStyle;dashed=1;" value="">
           <mxGeometry height="50" relative="1" width="50" as="geometry">
             <Array as="points">
               <mxPoint x="1240" y="1000" />
@@ -406,7 +448,7 @@
             <mxPoint x="1100" y="870" as="targetPoint" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="wire-button-pcb-gnd-label" connectable="0" parent="wire-button-pcb-gnd" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=10;fontStyle=1;fontColor=#000000;labelBackgroundColor=#FFFFFF;" value="GND wire" vertex="1">
+        <mxCell id="wire-buttons-pcb-gnd-label" connectable="0" parent="wire-buttons-pcb-gnd" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=10;fontStyle=1;fontColor=#000000;labelBackgroundColor=#FFFFFF;" value="Common GND" vertex="1">
           <mxGeometry relative="1" x="-0.3" y="1" as="geometry">
             <mxPoint as="offset" />
           </mxGeometry>

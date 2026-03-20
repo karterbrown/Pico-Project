@@ -7,7 +7,7 @@
 - [ ] BTF-LIGHTING 5V 10A Power Supply
 - [ ] 5× WS2812B LED strips (20 LEDs each = 100 total)
 - [ ] SV5W MP3 Module + SD card + Speaker
-- [ ] Button (momentary push button)
+- [ ] 6× Buttons (momentary push buttons)
 - [ ] SPST Power Switch (10A+ rated)
 - [ ] Central Distribution Board (terminal block PCB or breadboard)
 - [ ] Wire: 18 AWG (power), 22-24 AWG (signals)
@@ -48,17 +48,28 @@
    - GP5 (Pin 7) → I00/TX (UART transmit)
    - GP10 (Pin 14) → Busy (optional but recommended)
 
-8. **Connect Button**
-   - Terminal 1 → GP15 (Pin 20)
-   - Terminal 2 → GND rail
+8. **Connect Control Buttons (6 total)**
+   - Button 1 (Random): Terminal 1 → GP15 (Pin 20), Terminal 2 → GND rail
+   - Button 2 (Next): Terminal 1 → GP16 (Pin 21), Terminal 2 → GND rail
+   - Button 3 (Previous): Terminal 1 → GP17 (Pin 22), Terminal 2 → GND rail
+   - Button 4 (Pause): Terminal 1 → GP18 (Pin 24), Terminal 2 → GND rail
+   - Button 5 (Vol Up): Terminal 1 → GP19 (Pin 25), Terminal 2 → GND rail
+   - Button 6 (Vol Down): Terminal 1 → GP20 (Pin 26), Terminal 2 → GND rail
+
+9. **Configure SV5W DIP Switches for UART Mode**
+   - Set SW1: ON (enables UART control)
+   - Set SW2: OFF
+   - Consult SV5W manual for SW3-8 settings (varies by model)
+   - **Critical:** Wrong DIP switch = module won't respond to UART commands!
 
 9. **Pre-power checklist ✅**
    - [ ] All power connections secure
    - [ ] No loose wire strands
    - [ ] No shorts between +5V and GND
    - [ ] All 5 LED data connections correct
-   - [ ] Button wired
-   - [ ] SV5W triggers connected
+   - [ ] All 6 buttons wired
+   - [ ] SV5W UART connections (GP4, GP5, GP10)
+   - [ ] SV5W DIP switches set for UART mode
    - [ ] SD card inserted in SV5W
    - [ ] Power switch in OFF position
 
@@ -79,9 +90,14 @@
 3. Test colors: red, green, blue, white
 4. **Expected:** All LEDs working, correct colors
 
-### Test 3: Button
-1. Press button during test pattern
-2. **Expected:** Pattern changes
+### Test 3: Buttons
+1. Test each button individually (6 buttons)
+2. Button 1: Random track selection
+3. Button 2: Next track sequential
+4. Button 3: Previous track
+5. Button 4: Pause/resume
+6. Button 5/6: Volume control
+7. **Expected:** Each button performs its function
 
 ### Test 4: Audio
 1. Trigger track from button
@@ -164,7 +180,13 @@ Send all your track lists = Ready for programming! 📝
    - Rainbow
    - Custom combinations
 4. **Track Manager** - Handles multiple songs with different cue lists
-5. **Random Selector** - Button picks random track from your library
+5. **6-Button Control System:**
+   - Button 1: Play random track from library
+   - Button 2: Next track (sequential)
+   - Button 3: Previous track
+   - Button 4: Pause/Resume
+   - Button 5: Volume Up
+   - Button 6: Volume Down
 6. **Choreography Mapper** - Links each track number to its light show
 
 ### Your Part:
