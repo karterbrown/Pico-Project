@@ -1,6 +1,6 @@
 <mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36" version="29.6.4">
   <diagram name="Build Diagram - PCB Distribution" id="build-wiring">
-    <mxGraphModel dx="2703" dy="1674" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="2400" pageHeight="1600" math="0" shadow="0">
+    <mxGraphModel dx="1113" dy="689" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="2400" pageHeight="1600" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -425,9 +425,10 @@
         <mxCell id="wire-pico-buttons" edge="1" parent="1" source="pico-gp20" style="endArrow=classic;html=1;strokeColor=#B85450;strokeWidth=2.5;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;edgeStyle=orthogonalEdgeStyle;dashed=1;" target="buttons-box" value="">
           <mxGeometry height="50" relative="1" width="50" as="geometry">
             <Array as="points">
-              <mxPoint x="690" y="1500" />
-              <mxPoint x="1060" y="1500" />
-              <mxPoint x="1060" y="1220" />
+              <mxPoint x="690" y="1343" />
+              <mxPoint x="690" y="1480" />
+              <mxPoint x="1080" y="1480" />
+              <mxPoint x="1080" y="1220" />
             </Array>
             <mxPoint x="700" y="1200" as="sourcePoint" />
             <mxPoint x="750" y="1150" as="targetPoint" />
@@ -438,10 +439,11 @@
             <mxPoint x="10" as="offset" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="wire-buttons-pcb-gnd" edge="1" parent="1" source="btn-gnd-common" style="endArrow=classic;html=1;strokeColor=#000000;strokeWidth=2.5;exitX=0.5;exitY=0;exitDx=0;exitDy=0;edgeStyle=orthogonalEdgeStyle;dashed=1;" value="">
+        <mxCell id="wire-buttons-pcb-gnd" edge="1" parent="1" source="btn-gnd-common" style="endArrow=classic;html=1;strokeColor=#000000;strokeWidth=2.5;exitX=1;exitY=0.5;exitDx=0;exitDy=0;edgeStyle=orthogonalEdgeStyle;dashed=1;" value="">
           <mxGeometry height="50" relative="1" width="50" as="geometry">
             <Array as="points">
-              <mxPoint x="1240" y="1000" />
+              <mxPoint x="1410" y="1313" />
+              <mxPoint x="1410" y="1000" />
               <mxPoint x="1100" y="1000" />
             </Array>
             <mxPoint x="1100" y="1000" as="sourcePoint" />
