@@ -58,8 +58,9 @@
 
 9. **Configure SV5W DIP Switches for UART Mode**
    - Set SW1: ON (enables UART control)
-   - Set SW2: OFF
-   - Consult SV5W manual for SW3-8 settings (varies by model)
+   - Set SW2: OFF (disables trigger pin mode)
+   - Set SW3: OFF (normal playback mode)
+   - **Note:** This module has 3 DIP switches (not 8)
    - **Critical:** Wrong DIP switch = module won't respond to UART commands!
 
 9. **Pre-power checklist ✅**

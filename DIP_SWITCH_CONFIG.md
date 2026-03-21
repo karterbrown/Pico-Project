@@ -3,7 +3,7 @@
 ## UART Mode Setup (Required for Unlimited Tracks)
 
 ### DIP Switch Location:
-The SV5W module has a bank of **8 DIP switches** (SW1-SW8) on the board. They control the operating mode and settings.
+The SV5W module has a bank of **3 DIP switches** (SW1-SW3) on the board. They control the operating mode and settings.
 
 ---
 
@@ -15,12 +15,7 @@ The SV5W module has a bank of **8 DIP switches** (SW1-SW8) on the board. They co
 |--------|----------|----------|
 | **SW1** | **ON** | **Enable UART serial control (REQUIRED)** |
 | **SW2** | **OFF** | Disable trigger pin mode |
-| SW3 | Varies | Consult manual (often: playback mode) |
-| SW4 | Varies | Consult manual (often: repeat mode) |
-| SW5 | Varies | Consult manual |
-| SW6 | Varies | Consult manual |
-| SW7 | Varies | Consult manual |
-| SW8 | Varies | Consult manual |
+| SW3 | OFF | Normal playback mode (consult manual if issues) |
 
 ### Critical Settings:
 - ✅ **SW1 MUST be ON** - This enables UART mode
@@ -37,11 +32,6 @@ The SV5W module has a bank of **8 DIP switches** (SW1-SW8) on the board. They co
 SW1: ON   ← Enable UART
 SW2: OFF  ← Disable triggers
 SW3: OFF  ← Normal playback
-SW4: OFF  ← No repeat
-SW5: OFF
-SW6: OFF
-SW7: OFF
-SW8: OFF
 ```
 
 ### With Repeat/Loop:
@@ -49,11 +39,6 @@ SW8: OFF
 SW1: ON   ← Enable UART
 SW2: OFF  ← Disable triggers
 SW3: OFF
-SW4: ON   ← Enable repeat mode
-SW5: OFF
-SW6: OFF
-SW7: OFF
-SW8: OFF
 ```
 
 ---
@@ -65,12 +50,13 @@ SW8: OFF
 │  SV5W MP3 MODULE                │
 │                                 │
 │   [DIP SWITCH BANK]             │
-│   ┌─┬─┬─┬─┬─┬─┬─┬─┐             │
-│   │1│2│3│4│5│6│7│8│             │
-│   └─┴─┴─┴─┴─┴─┴─┴─┘             │
-│    ↑ ↑                          │
-│    │ └── SW2: OFF (no triggers) │
-│    └──── SW1: ON (UART enabled) │
+│   ┌─┬─┬─┐                       │
+│   │1│2│3│                       │
+│   └─┴─┴─┘                       │
+│    ↑ ↑ ↑                        │
+│    │ │ └── SW3: OFF             │
+│    │ └──── SW2: OFF (no triggers)│
+│    └────── SW1: ON (UART enabled)│
 │                                 │
 │   [VCC] [GND] [I00/TX] [I01/RX] │
 │                                 │
@@ -99,7 +85,7 @@ SW8: OFF
 |---------|-------|----------|
 | Module doesn't respond to UART | SW1 is OFF | Set SW1 to ON, power cycle |
 | Only trigger pins work | SW2 is ON | Set SW2 to OFF, power cycle |
-| Random playback issues | Wrong SW3-8 configuration | Reset all to OFF except SW1, test |
+| Random playback issues | Wrong SW3 configuration | Reset SW3 to OFF, test |
 | Module plays but Pico can't control | UART wires wrong | Check GP4→RX, GP5→TX |
 
 ---
@@ -113,12 +99,11 @@ SW8: OFF
 #### **Version A (Most Common):**
 - SW1: UART enable
 - SW2: Trigger mode
-- SW3-4: Playback modes
-- SW5-8: Advanced settings
+- SW3: Playback mode
 
 #### **Version B:**
 - SW1-2: Mode selection (both ON = UART)
-- SW3-8: Settings
+- SW3: Settings
 
 #### **Version C (Rare):**
 - All settings via serial commands
@@ -157,7 +142,7 @@ Before building your circuit:
 - [ ] Locate DIP switches on SV5W module
 - [ ] Set SW1 to ON (UART enable)
 - [ ] Set SW2 to OFF (trigger disable)
-- [ ] Set SW3-8 per manual (or all OFF to start)
+- [ ] Set SW3 per manual (or OFF to start)
 - [ ] Power cycle module
 - [ ] Test with simple UART commands
 - [ ] Confirm module responds before final assembly
