@@ -26,27 +26,34 @@
 3. **Connect Pico to PCB**
    - VBUS (Pin 40) → +5V rail
    - GND (Pin 38) → GND rail
+   - ⚠️ **Do NOT connect USB to the Pico at the same time the PSU is live.** Powering VBUS from the rail and having USB plugged in simultaneously can backfeed voltage — check your board behaviour before doing both.
 
 4. **Connect LED strips to PCB power**
    - All 5× strip 5V wires → +5V rail
    - All 5× strip GND wires → GND rail
+   - ⚠️ **Use adequate wire gauge.** 5 strips at full white can draw 3–5A+. Do not rely on thin hookup wire or a single narrow PCB trace for the shared power rail. Use a star or bus-bar distribution layout rated for the full load.
 
 5. **Connect LED data lines (Pico to strips)**
-   - Strip 1 DIN → GP0 (Pin 1)
-   - Strip 2 DIN → GP1 (Pin 2)
-   - Strip 3 DIN → GP2 (Pin 4)
-   - Strip 4 DIN → GP3 (Pin 5)
-   - Strip 5 DIN → GP11 (Pin 15)
+   - GP0 (Pin 1) → 330–470Ω resistor → Strip 1 DIN
+   - GP1 (Pin 2) → 330–470Ω resistor → Strip 2 DIN
+   - GP2 (Pin 4) → 330–470Ω resistor → Strip 3 DIN
+   - GP3 (Pin 5) → 330–470Ω resistor → Strip 4 DIN
+   - GP11 (Pin 15) → 330–470Ω resistor → Strip 5 DIN
+   - 🔌 **Add a 100–1000µF electrolytic capacitor across the +5V/GND rail close to where the LED strips are fed** (prevents power-on surge damage to the first LED in each strip).
+   - ⚠️ **Level shifter strongly recommended for permanent build:** WS2812B VIH = 0.7×VDD = 3.5V minimum at 5V supply. Pico GPIO is 3.3V — below spec. A 74AHCT125 or 74HCT14 between Pico GPIOs and DIN lines ensures reliable signalling. Direct 3.3V connection often works for testing but should not be relied on for a finished build.
 
 6. **Connect SV5W to PCB**
    - VCC → +5V rail
    - GND → GND rail
    - Speaker → SPK+/SPK-
 
-7. **Connect SV5W triggers (Pico to SV5W)**
-   - GP4 (Pin 6) → I01/RX (UART receive)
-   - GP5 (Pin 7) → I00/TX (UART transmit)
-   - GP10 (Pin 14) → Busy (optional but recommended)
+7. **Connect SV5W UART (Pico ↔ SV5W)**
+   - GP4 (Pin 6) **TX out** → **RXD / IO1** (SV5W serial receive input)
+   - GP5 (Pin 7) **RX in** ← **TXD / IO0** (SV5W serial transmit output)
+   - GP10 (Pin 14) **input** ← **BUSY** (high while playing)
+   - ⚠️ TX and RX **must be crossed** — Pico TX → SV5W RX, SV5W TX → Pico RX.
+   - ⚠️ At least one seller has noted the SV5W datasheet has **VCC and GND reversed**. Trust the **PCB silkscreen** for power pin orientation, not the datasheet.
+   - Default UART baud rate: **9600**.
 
 8. **Connect Control Buttons (6 total)**
    - Button 1 (Random): Terminal 1 → GP15 (Pin 20), Terminal 2 → GND rail
@@ -69,7 +76,7 @@
    - [ ] No shorts between +5V and GND
    - [ ] All 5 LED data connections correct
    - [ ] All 6 buttons wired
-   - [ ] SV5W UART connections (GP4, GP5, GP10)
+   - [ ] SV5W UART connections (GP4 TX→RXD/IO1, GP5 RX←TXD/IO0, GP10←BUSY)
    - [ ] SV5W DIP switches set for UART mode
    - [ ] SD card inserted in SV5W
    - [ ] Power switch in OFF position

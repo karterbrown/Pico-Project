@@ -22,6 +22,7 @@ The SV5W module has a bank of **3 DIP switches** (SW1-SW3) on the board. They co
 - ✅ **SW2 MUST be OFF** - This disables trigger pin mode (I02-I07)
 - ⚠️ **If SW1 is OFF:** Module will NOT respond to serial commands!
 - ⚠️ **If SW2 is ON:** Module may respond to trigger pins instead of UART
+- ⚠️ **Verify against your physical board:** Different clone revisions and documentation sets number or label switches differently. One reference lists CON3 CON2 CON1 = 1 0 0 for UART mode. **Always check the silkscreen on your exact module before power-up** — do not rely solely on this document.
 
 ---
 

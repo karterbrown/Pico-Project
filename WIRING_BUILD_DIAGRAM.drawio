@@ -127,10 +127,10 @@
         <mxCell id="pico-gp4" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f3e5f5;strokeColor=#9673A6;strokeWidth=2;fontSize=11;fontStyle=1;" value="GP4 TX → RX" vertex="1">
           <mxGeometry height="30" width="100" x="400" y="1260" as="geometry" />
         </mxCell>
-        <mxCell id="pico-gp5" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f3e5f5;strokeColor=#9673A6;strokeWidth=2;fontSize=11;fontStyle=1;" value="GP5 RX → TX" vertex="1">
+        <mxCell id="pico-gp5" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f3e5f5;strokeColor=#9673A6;strokeWidth=2;fontSize=11;fontStyle=1;" value="GP5 RX &lt;- TX" vertex="1">
           <mxGeometry height="30" width="100" x="400" y="1300" as="geometry" />
         </mxCell>
-        <mxCell id="pico-gp10" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f3e5f5;strokeColor=#9673A6;strokeWidth=2;fontSize=11;fontStyle=1;" value="GP10 → Busy" vertex="1">
+        <mxCell id="pico-gp10" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f3e5f5;strokeColor=#9673A6;strokeWidth=2;fontSize=11;fontStyle=1;" value="GP10 &lt;- Busy" vertex="1">
           <mxGeometry height="30" width="100" x="400" y="1340" as="geometry" />
         </mxCell>
         <mxCell id="pico-buttons-label" parent="1" style="text;html=1;align=left;verticalAlign=middle;fontSize=12;fontStyle=1;fontColor=#B85450;" value="BUTTONS (6):" vertex="1">
@@ -157,7 +157,7 @@
         <mxCell id="strips-area" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;strokeWidth=4;fontSize=15;fontStyle=1;verticalAlign=top;spacing=10;" value="LED STRIPS (5x 20 LEDs)" vertex="1">
           <mxGeometry height="420" width="700" x="1520" y="1050" as="geometry" />
         </mxCell>
-        <mxCell id="strips-note" parent="1" style="text;html=1;align=left;verticalAlign=middle;fontSize=11;fontStyle=2;fontColor=#d6b656;" value="Each strip: 3 wires&#xa;• DIN from Pico (data)&#xa;• 5V from PCB rail&#xa;• GND from PCB rail" vertex="1">
+        <mxCell id="strips-note" parent="1" style="text;html=1;align=left;verticalAlign=middle;fontSize=11;fontStyle=2;fontColor=#d6b656;" value="Each strip: 3 wires&#xa;* DIN &lt;- Pico via 330-470 ohm resistor&#xa;* 5V from PCB rail&#xa;* GND from PCB rail&#xa;(!) Add bulk cap (100-1000uF) on 5V rail near strips" vertex="1">
           <mxGeometry height="60" width="180" x="1540" y="1090" as="geometry" />
         </mxCell>
         <mxCell id="strip1-mini" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff9e6;strokeColor=#d6b656;strokeWidth=2;fontSize=12;fontStyle=1;verticalAlign=top;" value="STRIP 1" vertex="1">
