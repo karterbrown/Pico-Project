@@ -64,13 +64,14 @@
    - Button 6 (Vol Down): Terminal 1 → GP20 (Pin 26), Terminal 2 → GND rail
 
 9. **Configure SV5W DIP Switches for UART Mode**
+   - See DIP_SWITCH_CONFIG.md for full details.
    - Set SW1: ON (enables UART control)
    - Set SW2: OFF (disables trigger pin mode)
    - Set SW3: OFF (normal playback mode)
    - **Note:** This module has 3 DIP switches (not 8)
    - **Critical:** Wrong DIP switch = module won't respond to UART commands!
 
-9. **Pre-power checklist ✅**
+10. **Pre-power checklist ✅**
    - [ ] All power connections secure
    - [ ] No loose wire strands
    - [ ] No shorts between +5V and GND
@@ -113,7 +114,7 @@
 
 ### Debug if needed
 - Use multimeter to check voltages
-- Verify connections against WIRING_BUILD_DIAGRAM.drawio
+- Verify connections against your wiring diagram
 - Check for loose wires
 
 ---
@@ -260,7 +261,7 @@ Send all your track lists = Ready for programming! 📝
 - `./deploy.sh "message"` - Commit & push changes
 
 **Diagrams:**
-- WIRING_BUILD_DIAGRAM.drawio - Main build reference (UART mode for unlimited tracks)
+- WIRING_BUILD_DIAGRAM.drawio - Build reference diagram
 
 ---
 
@@ -269,8 +270,7 @@ Send all your track lists = Ready for programming! 📝
 - [x] Planning complete
 - [x] Wiring diagrams created
 - [x] Safety review passed
-- [ ] **→ NEXT: Order/receive LED strips**
-- [ ] Build hardware
+- [ ] **→ NEXT: Build hardware (follow Phase 1 steps above)**
 - [ ] Initial testing
 - [ ] Music preparation
 - [ ] Program light show
@@ -278,4 +278,4 @@ Send all your track lists = Ready for programming! 📝
 
 ---
 
-**You're on Phase 1 - Waiting for LEDs to arrive. When ready, start building with WIRING_BUILD_DIAGRAM.drawio!** 🚀
+**Build plan is ready. Follow Phase 1 step-by-step, then move to Phase 2 testing.** 🚀
