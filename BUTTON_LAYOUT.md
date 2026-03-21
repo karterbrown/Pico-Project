@@ -6,12 +6,12 @@
 
 | Button | GPIO Pin | Physical Pin | Function | Description |
 |--------|----------|--------------|----------|-------------|
-| **BTN 1** | GP15 | Pin 20 | **Play Random** | Picks random track from choreography library |
-| **BTN 2** | GP16 | Pin 21 | **Next Track** | Play next track sequentially |
-| **BTN 3** | GP17 | Pin 22 | **Previous** | Play previous track |
-| **BTN 4** | GP18 | Pin 24 | **Pause/Resume** | Pause current track or resume playback |
-| **BTN 5** | GP19 | Pin 25 | **Volume Up** | Increase speaker volume |
-| **BTN 6** | GP20 | Pin 26 | **Volume Down** | Decrease speaker volume |
+| **BTN 1** | GP16 | Pin 21 | **Play Random** | Picks random track from choreography library |
+| **BTN 2** | GP17 | Pin 22 | **Next Track** | Play next track sequentially |
+| **BTN 3** | GP18 | Pin 24 | **Previous** | Play previous track |
+| **BTN 4** | GP19 | Pin 25 | **Pause/Resume** | Pause current track or resume playback |
+| **BTN 5** | GP20 | Pin 26 | **Volume Up** | Increase speaker volume |
+| **BTN 6** | GP21 | Pin 27 | **Volume Down** | Decrease speaker volume |
 
 ---
 
@@ -23,7 +23,7 @@ Each button has 2 terminals:
 
 **Example for Button 1:**
 ```
-Button 1 Terminal 1 → GP15 (Pin 20)
+Button 1 Terminal 1 → GP16 (Pin 21)
 Button 1 Terminal 2 → GND Rail on PCB
 ```
 
@@ -94,7 +94,7 @@ Button 1 Terminal 2 → GND Rail on PCB
 
 After using 6 buttons + 5 LED strips + UART + Busy pin:
 
-**Still available:** GP6, GP7, GP8, GP9, GP12, GP13, GP14, GP21, GP22, GP26, GP27, GP28
+**Still available:** GP8, GP9, GP10, GP11, GP12, GP13, GP14, GP22, GP26, GP27, GP28
 
 You could add:
 - More buttons for advanced features
