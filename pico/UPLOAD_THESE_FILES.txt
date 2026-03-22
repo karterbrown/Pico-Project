@@ -1,0 +1,25 @@
+═══════════════════════════════════════════════════════
+  UPLOAD ALL FILES IN THIS FOLDER TO YOUR PICO
+═══════════════════════════════════════════════════════
+
+✓ main.py              - Main controller
+✓ song_config.py       - Song mapping  
+✓ events.py            - Demo light show
+✓ song0XX_events.py    - Your custom shows (add as created)
+
+═══════════════════════════════════════════════════════
+HOW TO UPLOAD
+═══════════════════════════════════════════════════════
+
+VS Code Method:
+1. Select all .py files in this folder
+2. Right-click → "Upload to Pico"
+
+Or:
+
+1. Right-click on "pico" folder
+2. "Upload project to Pico"
+
+═══════════════════════════════════════════════════════
+
+After upload → Reset Pico → Play music → Lights sync! 🎉

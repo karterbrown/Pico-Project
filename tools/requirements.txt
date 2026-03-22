@@ -1,0 +1,4 @@
+# MIDI to LED Lighting Converter Dependencies
+# Install with: pip install -r requirements.txt
+
+mido>=1.2.10
