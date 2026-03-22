@@ -10,8 +10,15 @@ Two modes:
 
 import sys
 import argparse
+import os
 from mido import MidiFile, tempo2bpm
 from typing import List, Tuple, Optional
+
+# Paths relative to the project root (one level up from tools/)
+TOOLS_DIR = os.path.dirname(os.path.abspath(__file__))
+PROJECT_ROOT = os.path.dirname(TOOLS_DIR)
+MIDI_SOURCES_DIR = os.path.join(PROJECT_ROOT, "midi_sources")
+PICO_OUTPUT_DIR = os.path.join(PROJECT_ROOT, "pico")
 
 
 def determine_effect(duration_beats: float) -> str:
@@ -337,28 +344,52 @@ Examples:
     
     parser.add_argument('mode', choices=['cue', 'interpret'],
                         help='cue: custom lighting track | interpret: auto-generate from notes')
-    parser.add_argument('input', help='Input MIDI file')
-    parser.add_argument('--output', '-o', default='events.py',
-                        help='Output Python file (default: events.py)')
-    
+    parser.add_argument('input', help='Input MIDI file or 5-digit song number (e.g. 00001)')
+    parser.add_argument('--output', '-o', default=None,
+                        help='Output .py file (default: pico/<number>_events.py)')
+    parser.add_argument('--offset', type=int, default=0,
+                        help='Shift all events forward by this many milliseconds (pre-roll buffer)')
+    parser.add_argument('--bars', type=float, default=0,
+                        help='Shift all events forward by this many bars (calculated from MIDI tempo)')
+
     args = parser.parse_args()
-    
+
+    # Resolve input path - if just a number, look in midi_sources/
+    input_path = args.input
+    if not os.path.exists(input_path):
+        # Try treating it as a 5-digit number
+        padded = args.input.zfill(5)
+        candidate = os.path.join(MIDI_SOURCES_DIR, f"{padded}.mid")
+        if os.path.exists(candidate):
+            input_path = candidate
+        else:
+            print(f"Error: could not find '{args.input}' or '{candidate}'")
+            return 1
+
+    # Resolve output path - default to pico/<number>_events.py
+    if args.output:
+        output_path = args.output
+    else:
+        basename = os.path.splitext(os.path.basename(input_path))[0].zfill(5)
+        output_path = os.path.join(PICO_OUTPUT_DIR, f"{basename}_events.py")
+        os.makedirs(PICO_OUTPUT_DIR, exist_ok=True)
+
     # Load MIDI file
     try:
-        print(f"Loading MIDI file: {args.input}")
-        midi_file = MidiFile(args.input)
+        print(f"Loading MIDI file: {input_path}")
+        midi_file = MidiFile(input_path)
     except Exception as e:
         print(f"Error loading MIDI file: {e}")
         return 1
-    
+
     # Get MIDI info
     tempo_bpm = get_tempo_bpm(midi_file)
     duration_ms = get_duration_ms(midi_file)
-    
+
     print(f"Tempo: {tempo_bpm:.1f} BPM")
     print(f"Duration: {duration_ms / 1000:.2f} seconds")
     print(f"Mode: {args.mode}")
-    
+
     # Convert based on mode
     if args.mode == 'cue':
         print("\nConverting custom lighting cue track...")
@@ -367,18 +398,33 @@ Examples:
     else:  # interpret
         print("\nInterpreting MIDI notes as auto light show...")
         events = convert_interpret_mode(midi_file)
-    
+
     # Clean events
     events = clean_events(events)
-    
+
+    # Apply offset (pre-roll buffer)
+    offset_ms = args.offset
+    if args.bars > 0:
+        beats_per_bar = 4  # 4/4 time
+        ms_per_beat = (60.0 / tempo_bpm) * 1000
+        offset_ms += int(args.bars * beats_per_bar * ms_per_beat)
+        print(f"\nBar offset: {args.bars} bars @ {tempo_bpm:.1f} BPM = {offset_ms}ms")
+
+    if offset_ms > 0:
+        events = [(t + offset_ms, s, b, e, d) for t, s, b, e, d in events]
+        print(f"Applied offset: +{offset_ms}ms to all events")
+
     # Export
-    export_events(events, args.output)
-    
+    export_events(events, output_path)
+
     # Summary
+    base = os.path.splitext(os.path.basename(output_path))[0].replace('_events', '')
     print(f"\nSummary:")
     print(f"  Events generated: {len(events)}")
-    print(f"  Output file: {args.output}")
-    
+    print(f"  Output file: {output_path}")
+    print(f"\nReminder: SD card MP3 should be named {base}.mp3")
+    print(f"  5-digit format required: e.g. 00001.mp3, 00002.mp3")
+
     if events:
         print(f"  First event at: {events[0][0]} ms")
         print(f"  Last event at: {events[-1][0]} ms")

@@ -19,7 +19,7 @@ This installs `mido` for reading MIDI files.
 When you've created a lighting cue track in Logic Pro:
 
 ```bash
-python lights_tool.py cue ../midi_sources/my_song.mid -o ../pico/song001_events.py
+python lights_tool.py cue ../midi_sources/00001.mid -o ../pico/00001_events.py
 ```
 
 **What it does:**
@@ -33,7 +33,7 @@ python lights_tool.py cue ../midi_sources/my_song.mid -o ../pico/song001_events.
 When you have existing MIDI and want automatic lighting:
 
 ```bash
-python lights_tool.py interpret ../midi_sources/song.mid -o ../pico/song002_events.py
+python lights_tool.py interpret ../midi_sources/00002.mid -o ../pico/00002_events.py
 ```
 
 **What it does:**
@@ -62,18 +62,26 @@ python lights_tool.py --help
 
 Use track numbers in output names for easy organization:
 
+Name your MIDI source files with 5 digits matching the song number on the SD card:
+
+```
+00001.mid  →  song for track 00001.mp3
+00002.mid  →  song for track 00002.mp3
+```
+
+Convert them:
 ```bash
-python lights_tool.py cue track1.mid -o ../pico/song001_events.py
-python lights_tool.py cue track2.mid -o ../pico/song002_events.py
-python lights_tool.py cue track3.mid -o ../pico/song003_events.py
+python lights_tool.py cue 00001.mid -o ../pico/00001_events.py
+python lights_tool.py cue 00002.mid -o ../pico/00002_events.py
+python lights_tool.py cue 00003.mid -o ../pico/00003_events.py
 ```
 
 Then in `song_config.py`:
 ```python
 SONG_MAPPING = {
-    1: "song001_events",  # Track 1
-    2: "song002_events",  # Track 2
-    3: "song003_events",  # Track 3
+    1: "00001_events",  # Track 00001
+    2: "00002_events",  # Track 00002
+    3: "00003_events",  # Track 00003
 }
 ```
 
@@ -84,8 +92,8 @@ Convert multiple files at once:
 ```bash
 # Convert tracks 1-10
 for i in {1..10}; do
-    python lights_tool.py cue ../midi_sources/track${i}.mid \
-        -o ../pico/song$(printf "%03d" $i)_events.py
+    python lights_tool.py cue $(printf "%05d" $i).mid \
+        -o ../pico/$(printf "%05d" $i)_events.py
 done
 ```
 
