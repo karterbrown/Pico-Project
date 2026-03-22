@@ -17,14 +17,11 @@
 #   6: None
 
 SONG_MAPPING = {
-    # Default mapping - all songs use the demo events
-    # Add your custom mappings here after generating event files
-    1: "events",      # Track 1 → events.py (demo)
-    2: "events",      # Track 2 → events.py (demo)
-    3: "events",      # Track 3 → events.py (demo)
-    4: "events",      # Track 4 → events.py (demo)
-    5: "events",      # Track 5 → events.py (demo)
-    # Add more mappings as needed
+    1: "00001_events",  # Track 00001 → 00001_events.py
+    2: "events",        # Track 2 → events.py (demo placeholder)
+    3: "events",
+    4: "events",
+    5: "events",
 }
 
 # Default event file to use if song number not found in mapping
