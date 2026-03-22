@@ -48,9 +48,10 @@
    - Speaker → SPK+/SPK-
 
 7. **Connect SV5W UART (Pico ↔ SV5W)**
-   - GP6 (Pin 9) **TX out** → **IO1 / RXD** (SV5W serial receive input)
-   - GP7 (Pin 10) **RX in** ← **IO0 / TXD** (SV5W serial transmit output)
+   - GP8 (Pin 11) **TX out** → **IO1 / RXD** (SV5W serial receive input)
+   - GP9 (Pin 12) **RX in** ← **IO0 / TXD** (SV5W serial transmit output)
    - GP5 (Pin 7) **input** ← **BUSY** (high while playing)
+   - ⚠️ **GP6/GP7 are UART1 CTS/RTS on RP2040 — they cannot be used as TX/RX. Use GP8/GP9 instead.**
    - ⚠️ TX and RX **must be crossed** — Pico TX → SV5W RX, SV5W TX → Pico RX.
    - ⚠️ At least one seller has noted the SV5W datasheet has **VCC and GND reversed**. Trust the **PCB silkscreen** for power pin orientation, not the datasheet.
    - Default UART baud rate: **9600**.
@@ -77,7 +78,7 @@
    - [ ] No shorts between +5V and GND
    - [ ] All 5 LED data connections correct
    - [ ] All 6 buttons wired
-   - [ ] SV5W UART connections (GP6 TX→IO1/RXD, GP7 RX←IO0/TXD, GP5←BUSY)
+   - [ ] SV5W UART connections (GP8 TX→IO1/RXD, GP9 RX←IO0/TXD, GP5←BUSY)
    - [ ] SV5W DIP switches set for UART mode
    - [ ] SD card inserted in SV5W
    - [ ] Power switch in OFF position
