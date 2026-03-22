@@ -3,6 +3,21 @@ from neopixel import NeoPixel  # type: ignore
 from time import sleep, ticks_ms, ticks_diff
 import math
 import sys
+import struct
+
+# Effect index list — must match tools/lights_tool.py EFFECTS order
+EFFECTS = ["strobe", "flash", "pulse", "fade", "hold", "wave"]
+RECORD_SIZE = 12  # bytes: uint32 time_ms + uint8 strip + uint8 brightness + uint8 effect_idx + uint8 led_pos + uint32 duration_ms
+
+# Strip colors — rotate across strips over time
+STRIP_COLORS = [
+    (0, 200, 255),   # Electric blue
+    (0, 60, 255),    # Blue
+    (148, 0, 211),   # Purple
+    (255, 200, 0),   # Yellow
+    (0, 200, 50),    # Green
+]
+COLOR_ROTATE_MS = 10000  # Shift color assignment every 10 seconds
 
 # Boot delay - gives MicroPico/REPL time to connect and interrupt before the loop starts
 sleep(3)
@@ -17,9 +32,8 @@ NUM_LEDS = 20
 strips = [NeoPixel(Pin(i), NUM_LEDS) for i in range(5)]
 
 # ---- SV5W Audio Player Setup ----
-# UART1: GP8 TX → SV5W IO1/RXD, GP9 RX ← SV5W IO0/TXD
-# Note: GP6/GP7 are CTS/RTS on RP2040 - not valid for UART TX/RX
-uart = UART(1, baudrate=9600, tx=Pin(8), rx=Pin(9))
+# UART0: GP16 TX → SV5W IO0/RXD, GP17 RX ← SV5W IO1/TXD
+uart = UART(0, baudrate=9600, tx=Pin(16), rx=Pin(17))
 busy = Pin(5, Pin.IN)  # LOW = playing, HIGH = idle
 
 # Track current playing song
@@ -29,9 +43,13 @@ QUERY_INTERVAL_MS = 500  # Query current track every 500ms
 
 def sv5w_cmd(cmd, msb=0, lsb=0):
     """Send a command to the SV5W in DFPlayer-style protocol."""
-    msg = bytes([0x7E, 0xFF, 0x06, cmd, 0x00, msb, lsb, 0xEF])
+    # Checksum includes VER byte: -(VER + LEN + CMD + Feedback + Para1 + Para2)
+    checksum = (-(0xFF + 0x06 + cmd + 0x00 + msb + lsb)) & 0xFFFF
+    chk_h = (checksum >> 8) & 0xFF
+    chk_l = checksum & 0xFF
+    msg = bytes([0x7E, 0xFF, 0x06, cmd, 0x00, msb, lsb, chk_h, chk_l, 0xEF])
     uart.write(msg)
-    sleep(0.05)
+    sleep(0.1)
 
 def query_current_track():
     """Query the current playing track number from SV5W."""
@@ -90,14 +108,14 @@ def player_set_vol(level):
     sv5w_cmd(0x06, 0x00, max(0, min(30, level)))
     print("[AUDIO] Volume set to", level)
 
-# ---- Button Setup (GP16-GP21, active LOW with PULL_UP) ----
+# ---- Button Setup (GP18-GP22 + GP26, active LOW with PULL_UP) ----
 BUTTONS = {
-    "Random":   Pin(16, Pin.IN, Pin.PULL_UP),
-    "Next":     Pin(17, Pin.IN, Pin.PULL_UP),
-    "Previous": Pin(18, Pin.IN, Pin.PULL_UP),
-    "Pause":    Pin(19, Pin.IN, Pin.PULL_UP),
-    "Vol Up":   Pin(20, Pin.IN, Pin.PULL_UP),
-    "Vol Down": Pin(21, Pin.IN, Pin.PULL_UP),
+    "Random":   Pin(18, Pin.IN, Pin.PULL_UP),
+    "Next":     Pin(19, Pin.IN, Pin.PULL_UP),
+    "Previous": Pin(20, Pin.IN, Pin.PULL_UP),
+    "Pause":    Pin(21, Pin.IN, Pin.PULL_UP),
+    "Vol Up":   Pin(22, Pin.IN, Pin.PULL_UP),
+    "Vol Down": Pin(26, Pin.IN, Pin.PULL_UP),
 }
 
 BUTTON_ACTIONS = {
@@ -130,14 +148,18 @@ class StripState:
     def __init__(self):
         self.effect = None
         self.brightness = 0
+        self.color = (255, 255, 255)
+        self.led_pos = 255  # 255 = whole strip, 0-19 = specific LED
         self.start_time = 0
         self.duration = 0
         self.active = False
-    
-    def start_effect(self, effect, brightness, duration, current_time):
+
+    def start_effect(self, effect, brightness, duration, current_time, color=(255, 255, 255), led_pos=255):
         """Start a new effect on this strip"""
         self.effect = effect
         self.brightness = brightness
+        self.color = color
+        self.led_pos = led_pos
         self.start_time = current_time
         self.duration = duration
         self.active = True
@@ -178,143 +200,166 @@ class StripState:
         
         strip.write()
     
-    def _scale_brightness(self, base_value):
-        """Scale a base brightness value (0-255) by the event brightness"""
-        return int((base_value / 255.0) * self.brightness)
-    
-    def _effect_strobe(self, strip, elapsed):
-        """Rapid on/off flashing"""
-        # Strobe at ~20Hz
-        if (elapsed // 50) % 2 == 0:
-            strip.fill((self.brightness, self.brightness, self.brightness))
+    def _scale_color(self, factor):
+        """Scale strip color by factor (0.0-1.0) and event brightness"""
+        r, g, b = self.color
+        f = factor * (self.brightness / 255.0)
+        return (int(r * f), int(g * f), int(b * f))
+
+    def _set_leds(self, strip, color):
+        """Light specific LED(s) based on led_pos. 255 = fill whole strip."""
+        if self.led_pos == 255:
+            strip.fill(color)
         else:
             strip.fill((0, 0, 0))
-    
-    def _effect_flash(self, strip, progress):
-        """Quick flash with fast fade out"""
-        fade = max(0, 1.0 - progress)
-        bright = int(self.brightness * fade)
-        strip.fill((bright, bright, bright))
-    
-    def _effect_pulse(self, strip, progress):
-        """Smooth pulse in and out"""
-        # Sine wave for smooth pulse
-        pulse = math.sin(progress * math.pi)
-        bright = int(self.brightness * pulse)
-        strip.fill((bright, bright, bright))
-    
-    def _effect_fade(self, strip, progress):
-        """Linear fade out"""
-        fade = 1.0 - progress
-        bright = int(self.brightness * fade)
-        strip.fill((bright, bright, bright))
-    
-    def _effect_hold(self, strip, progress):
-        """Hold brightness then fade out at the end"""
-        if progress < 0.7:
-            # Hold steady
-            strip.fill((self.brightness, self.brightness, self.brightness))
+            # Light target LED plus soft neighbors for a natural look
+            for offset in range(-2, 3):
+                idx = self.led_pos + offset
+                if 0 <= idx < NUM_LEDS:
+                    fade = 1.0 if offset == 0 else (0.4 if abs(offset) == 1 else 0.1)
+                    r, g, b = color
+                    strip[idx] = (int(r * fade), int(g * fade), int(b * fade))
+
+    def _effect_strobe(self, strip, elapsed):
+        """Rapid on/off — hard cut between full color and black"""
+        if (elapsed // 40) % 2 == 0:
+            self._set_leds(strip, self._scale_color(1.0))
         else:
-            # Fade out in last 30%
-            fade = (1.0 - progress) / 0.3
-            bright = int(self.brightness * fade)
-            strip.fill((bright, bright, bright))
-    
+            strip.fill((0, 0, 0))
+
+    def _effect_flash(self, strip, progress):
+        """Instant peak then sharp decay"""
+        fade = max(0, 1.0 - (progress ** 0.5))
+        self._set_leds(strip, self._scale_color(fade))
+
+    def _effect_pulse(self, strip, progress):
+        """Smooth sine wave in and out"""
+        pulse = math.sin(progress * math.pi)
+        self._set_leds(strip, self._scale_color(pulse))
+
+    def _effect_fade(self, strip, progress):
+        """Linear fade out from full brightness"""
+        self._set_leds(strip, self._scale_color(1.0 - progress))
+
+    def _effect_hold(self, strip, progress):
+        """Hold at full brightness, then quick fade at the end"""
+        if progress < 0.75:
+            self._set_leds(strip, self._scale_color(1.0))
+        else:
+            fade = (1.0 - progress) / 0.25
+            self._set_leds(strip, self._scale_color(fade))
+
     def _effect_wave(self, strip, current_time, elapsed):
-        """Moving wave/chase effect"""
-        # Calculate wave position
-        wave_speed = 0.1  # Wave cycles per ms
-        wave_pos = (elapsed * wave_speed) % NUM_LEDS
-        
+        """Color wave chasing across the strip"""
+        wave_speed = 0.15
+        # Anchor wave around led_pos if set, else free-running
+        center = self.led_pos if self.led_pos != 255 else (elapsed * wave_speed) % NUM_LEDS
+        wave_pos = (center + elapsed * wave_speed) % NUM_LEDS
+        strip.fill((0, 0, 0))
         for i in range(NUM_LEDS):
-            # Distance from wave peak
             dist = abs(i - wave_pos)
             if dist > NUM_LEDS / 2:
                 dist = NUM_LEDS - dist
-            
-            # Brightness based on distance (gaussian-like)
-            brightness_factor = max(0, 1.0 - (dist / 5.0))
-            bright = int(self.brightness * brightness_factor)
-            strip[i] = (bright, bright, bright)
+            brightness_factor = max(0, 1.0 - (dist / 4.0))
+            strip[i] = self._scale_color(brightness_factor)
 
 
 class LightingPlayer:
-    """Manages playback of lighting events"""
+    """Manages playback of lighting events streamed from binary file"""
     def __init__(self, strips):
         self.strips = strips
         self.strip_states = [StripState() for _ in range(len(strips))]
-        self.events = []
-        self.event_index = 0
+        self._file = None
+        self._next_event = None
         self.playing = False
         self.start_time = 0
-    
-    def load_events(self, events):
-        """Load events list: (time_ms, strip_index, brightness, effect, duration_ms)"""
-        self.events = sorted(events, key=lambda x: x[0])
-        print(f"[LIGHT] Loaded {len(self.events)} events")
-    
+
+    def open_file(self, filename):
+        """Open a binary events file for streaming playback"""
+        if self._file:
+            self._file.close()
+            self._file = None
+        try:
+            self._file = open(filename, 'rb')
+            self._next_event = self._read_next()
+            import os as _os
+            count = _os.stat(filename)[6] // RECORD_SIZE
+            print(f"[LIGHT] Opened {filename} ({count} events)")
+            return True
+        except Exception as e:
+            print(f"[LIGHT] Error opening {filename}: {e}")
+            return False
+
+    def _read_next(self):
+        """Read the next event record from the binary file"""
+        if not self._file:
+            return None
+        data = self._file.read(RECORD_SIZE)
+        if len(data) < RECORD_SIZE:
+            return None
+        time_ms, strip_index, brightness, effect_idx, led_pos, duration_ms = struct.unpack('<IBBBBI', data)
+        effect = EFFECTS[effect_idx] if effect_idx < len(EFFECTS) else "flash"
+        return (time_ms, strip_index, brightness, effect, duration_ms, led_pos)
+
     def start(self):
         """Start playback from beginning"""
         if self.playing:
             print("[LIGHT] Already playing")
             return
-        
-        if not self.events:
-            print("[LIGHT] No events loaded")
+        if not self._file:
+            print("[LIGHT] No events file loaded")
             return
-        
+        self._file.seek(0)
+        self._next_event = self._read_next()
         self.playing = True
-        self.event_index = 0
         self.start_time = ticks_ms()
         print("[LIGHT] Playback started")
-        
-        # Clear all strips
         for strip in self.strips:
             strip.fill((0, 0, 0))
             strip.write()
-    
+
     def stop(self):
         """Stop playback"""
         self.playing = False
-        self.event_index = 0
-        
-        # Clear all strips
+        if self._file:
+            self._file.seek(0)
+            self._next_event = self._read_next()
         for strip in self.strips:
             strip.fill((0, 0, 0))
             strip.write()
-        
         print("[LIGHT] Playback stopped")
-    
+
     def update(self):
         """Update all strips - call this in main loop"""
         if not self.playing:
             return
-        
+
         current_time = ticks_ms()
         playback_time = ticks_diff(current_time, self.start_time)
-        
+
+        # Rotate color assignment across strips over time
+        color_offset = (playback_time // COLOR_ROTATE_MS) % len(STRIP_COLORS)
+
         # Process any events that should trigger now
-        while self.event_index < len(self.events):
-            event_time, strip_index, brightness, effect, duration = self.events[self.event_index]
-            
+        while self._next_event is not None:
+            event_time, strip_index, brightness, effect, duration, led_pos = self._next_event
             if event_time <= playback_time:
-                # Trigger this event
                 if 0 <= strip_index < len(self.strip_states):
+                    color = STRIP_COLORS[(strip_index + color_offset) % len(STRIP_COLORS)]
                     self.strip_states[strip_index].start_effect(
-                        effect, brightness, duration, current_time
+                        effect, brightness, duration, current_time, color, led_pos
                     )
-                self.event_index += 1
+                self._next_event = self._read_next()
             else:
                 break
-        
+
         # Update all active effects
         for i, state in enumerate(self.strip_states):
             if state.active:
                 state.update(self.strips[i], current_time)
-        
+
         # Check if playback is complete
-        if self.event_index >= len(self.events):
-            # Check if all effects are done
+        if self._next_event is None:
             if not any(state.active for state in self.strip_states):
                 print("[LIGHT] Playback complete")
                 self.playing = False
@@ -335,42 +380,24 @@ except ImportError:
 
 def load_events_for_song(song_number):
     """
-    Dynamically load and start events for a specific song
-    
-    Args:
-        song_number: Track number from SV5W player
+    Open binary events file and start playback for the given song number.
+    Binary files are named <number>.bin (e.g. 00001.bin).
     """
-    # Get the event module name for this song
     event_module_name = get_events_for_song(song_number)
-    
+
     if event_module_name is None:
         print(f"[LIGHT] Song {song_number}: No lights configured")
         player.stop()
         return False
-    
-    try:
-        # Remove old module if it exists
-        if event_module_name in sys.modules:
-            del sys.modules[event_module_name]
-        
-        # Dynamically import the event module
-        event_module = __import__(event_module_name)
-        
-        if hasattr(event_module, 'events'):
-            events = event_module.events
-            player.load_events(events)
-            player.start()
-            print(f"[LIGHT] Song {song_number}: Loaded {len(events)} events from {event_module_name}.py")
-            return True
-        else:
-            print(f"[LIGHT] Song {song_number}: No 'events' list in {event_module_name}.py")
-            return False
-            
-    except ImportError:
-        print(f"[LIGHT] Song {song_number}: Event file {event_module_name}.py not found")
-        return False
-    except Exception as e:
-        print(f"[LIGHT] Song {song_number}: Error loading events: {e}")
+
+    # Derive binary filename: "00001_events" → "00001.bin"
+    bin_filename = event_module_name.replace('_events', '') + '.bin'
+
+    if player.open_file(bin_filename):
+        player.start()
+        return True
+    else:
+        print(f"[LIGHT] Song {song_number}: Could not load {bin_filename}")
         return False
 
 
@@ -467,12 +494,12 @@ print("\n" + "="*50)
 print("Auto-Sync MIDI Lighting Controller")
 print("="*50)
 print("\nControls:")
-print("  GP16 = Random track")
-print("  GP17 = Next track")
-print("  GP18 = Previous track")
-print("  GP19 = Pause/Play")
-print("  GP20 = Volume Up")
-print("  GP21 = Volume Down")
+print("  GP21 = Random track")
+print("  GP22 = Next track")
+print("  GP24 = Previous track")
+print("  GP25 = Pause/Play")
+print("  GP26 = Volume Up")
+print("  GP27 = Volume Down")
 print("\nLED Strips: GP0, GP1, GP2, GP3, GP4")
 print("\nLights auto-start when songs change!")
 print("Configure mappings in song_config.py")
@@ -481,13 +508,26 @@ print("="*50 + "\n")
 # Uncomment to run test mode on startup:
 # test_mode()
 
-# Set initial volume and start playing
-player_set_vol(20)
+# Init SV5W: reset, wait for it to boot, then set volume and play track 1
+print("[AUDIO] Initialising SV5W...")
+sv5w_cmd(0x0C)          # Reset
+sleep(3)                # Wait for module to fully boot and read SD card
+player_set_vol(25)
 sleep(0.2)
-player_random()  # Start with a random track
+sv5w_cmd(0x03, 0x00, 1) # Play track 1 explicitly
+sleep(0.2)
+# Read any response to confirm
+if uart.any():
+    resp = uart.read()
+    print(f"[AUDIO] SV5W response: {list(resp) if resp else 'empty'}")
+else:
+    print("[AUDIO] No response from SV5W — check wiring/power")
 
 print("[AUDIO] Starting playback...")
 print("[LIGHT] Monitoring for song changes...\n")
+
+# Auto-start song 1 light show immediately (SV5W will sync once connected)
+load_events_for_song(1)
 
 # Main loop
 try:

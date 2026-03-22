@@ -11,8 +11,13 @@ Two modes:
 import sys
 import argparse
 import os
+import struct
 from mido import MidiFile, tempo2bpm
 from typing import List, Tuple, Optional
+
+# Effect index mapping (must match pico/main.py EFFECTS list)
+EFFECTS = ["strobe", "flash", "pulse", "fade", "hold", "wave"]
+RECORD_SIZE = 11  # bytes per event: uint32 + uint8 + uint8 + uint8 + uint32
 
 # Paths relative to the project root (one level up from tools/)
 TOOLS_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -175,16 +180,20 @@ def convert_interpret_mode(midi_file: MidiFile) -> List[Tuple[int, int, int, str
     min_note = min(all_note_numbers)
     max_note = max(all_note_numbers)
     note_range = max_note - min_note if max_note > min_note else 1
-    
-    def note_to_strip(note_number: int) -> int:
-        """Map note pitch to strip (0-4) based on range"""
-        if note_range == 0:
-            return 2  # Middle strip if all notes are same
-        
-        # Normalize to 0-1, then scale to 0-4
-        normalized = (note_number - min_note) / note_range
-        strip = int(normalized * 4.999)  # Maps to 0-4
-        return max(0, min(4, strip))
+
+    # Round-robin strip counter — guarantees equal event counts across all 5 strips
+    _strip_counter = [0]
+
+    def note_to_strip() -> int:
+        """Assign strips round-robin by event order for perfectly even distribution"""
+        idx = _strip_counter[0] % 5
+        _strip_counter[0] += 1
+        return idx
+
+    def note_to_led_pos(note_number: int) -> int:
+        """Map note pitch to LED position (0-19) using global note range"""
+        pos = (note_number - min_note) / note_range
+        return max(0, min(19, int(pos * 19.999)))
     
     # Second pass: process events
     current_tick = 0
@@ -230,15 +239,16 @@ def convert_interpret_mode(midi_file: MidiFile) -> List[Tuple[int, int, int, str
                     # Determine effect
                     effect = determine_effect(duration_beats)
                     
-                    # Map note to strip
-                    strip_index = note_to_strip(msg.note)
-                    
+                    # Map note to strip (round-robin) and LED position (pitch-based)
+                    strip_index = note_to_strip()
+                    led_pos = note_to_led_pos(msg.note)
+
                     # Get brightness
                     brightness = velocity_to_brightness(note_start['velocity'])
-                    
-                    # Add event
-                    events.append((start_ms, strip_index, brightness, effect, duration_ms))
-                    
+
+                    # Add event with led_pos
+                    events.append((start_ms, strip_index, brightness, effect, duration_ms, led_pos))
+
                     del active_notes[key]
     
     # Sort events by time
@@ -263,17 +273,20 @@ def clean_events(events: List[Tuple[int, int, int, str, int]]) -> List[Tuple[int
     """
     cleaned = []
     
-    for time_ms, strip_index, brightness, effect, duration_ms in events:
+    for event in events:
+        time_ms, strip_index, brightness, effect, duration_ms = event[:5]
+        led_pos = event[5] if len(event) > 5 else 255
+
         # Clamp brightness
         brightness = max(0, min(255, brightness))
-        
+
         # Ensure valid strip index
         strip_index = max(0, min(4, strip_index))
-        
+
         # Ensure positive duration
         duration_ms = max(10, duration_ms)
-        
-        cleaned.append((time_ms, strip_index, brightness, effect, duration_ms))
+
+        cleaned.append((time_ms, strip_index, brightness, effect, duration_ms, led_pos))
     
     # Sort by time
     cleaned.sort(key=lambda x: x[0])
@@ -281,26 +294,21 @@ def clean_events(events: List[Tuple[int, int, int, str, int]]) -> List[Tuple[int
     return cleaned
 
 
-def export_events(events: List[Tuple[int, int, int, str, int]], output_file: str):
+def export_events_binary(events: List[Tuple], output_file: str):
     """
-    Export events to Python file for Pico
-    
-    Args:
-        events: Event list
-        output_file: Output filename
+    Export events as compact binary file for memory-efficient Pico streaming.
+    Format per record (12 bytes): uint32 time_ms, uint8 strip, uint8 brightness,
+                                   uint8 effect_idx, uint8 led_pos, uint32 duration_ms
     """
-    with open(output_file, 'w') as f:
-        f.write('# LED Lighting Events\n')
-        f.write('# Format: (time_ms, strip_index, brightness, effect, duration_ms)\n')
-        f.write('# Effects: strobe, flash, pulse, fade, hold, wave\n\n')
-        f.write('events = [\n')
-        
+    with open(output_file, 'wb') as f:
         for event in events:
-            f.write(f'    {event},\n')
-        
-        f.write(']\n')
-    
-    print(f"✓ Exported {len(events)} events to {output_file}")
+            time_ms, strip_index, brightness, effect, duration_ms = event[:5]
+            led_pos = event[5] if len(event) > 5 else 255  # 255 = fill whole strip
+            effect_idx = EFFECTS.index(effect) if effect in EFFECTS else 1
+            f.write(struct.pack('<IBBBBI', time_ms, strip_index, brightness, effect_idx, led_pos, duration_ms))
+
+    size_kb = os.path.getsize(output_file) / 1024
+    print(f"✓ Exported {len(events)} events to {output_file} ({size_kb:.1f} KB)")
 
 
 def get_tempo_bpm(midi_file: MidiFile) -> float:
@@ -366,12 +374,12 @@ Examples:
             print(f"Error: could not find '{args.input}' or '{candidate}'")
             return 1
 
-    # Resolve output path - default to pico/<number>_events.py
+    # Resolve output path - default to pico/<number>.bin
     if args.output:
         output_path = args.output
     else:
         basename = os.path.splitext(os.path.basename(input_path))[0].zfill(5)
-        output_path = os.path.join(PICO_OUTPUT_DIR, f"{basename}_events.py")
+        output_path = os.path.join(PICO_OUTPUT_DIR, f"{basename}.bin")
         os.makedirs(PICO_OUTPUT_DIR, exist_ok=True)
 
     # Load MIDI file
@@ -411,11 +419,11 @@ Examples:
         print(f"\nBar offset: {args.bars} bars @ {tempo_bpm:.1f} BPM = {offset_ms}ms")
 
     if offset_ms > 0:
-        events = [(t + offset_ms, s, b, e, d) for t, s, b, e, d in events]
+        events = [(e[0] + offset_ms,) + e[1:] for e in events]
         print(f"Applied offset: +{offset_ms}ms to all events")
 
-    # Export
-    export_events(events, output_path)
+    # Export as binary
+    export_events_binary(events, output_path)
 
     # Summary
     base = os.path.splitext(os.path.basename(output_path))[0].replace('_events', '')
