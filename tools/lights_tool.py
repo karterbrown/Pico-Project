@@ -17,7 +17,7 @@ from typing import List, Tuple, Optional
 
 # Effect index mapping (must match pico/main.py EFFECTS list)
 EFFECTS = ["strobe", "flash", "pulse", "fade", "hold", "wave"]
-RECORD_SIZE = 11  # bytes per event: uint32 + uint8 + uint8 + uint8 + uint32
+RECORD_SIZE = 12  # bytes per event: uint32 time_ms + uint8 strip + uint8 brightness + uint8 effect_idx + uint8 led_pos + uint32 duration_ms
 
 # Paths relative to the project root (one level up from tools/)
 TOOLS_DIR = os.path.dirname(os.path.abspath(__file__))

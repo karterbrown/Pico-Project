@@ -53,7 +53,7 @@ def sv5w_cmd(cmd, msb=0, lsb=0):
 
 def query_current_track():
     """Query the current playing track number from SV5W."""
-    sv5w_cmd(0x4C)  # Query current file in TF card
+    sv5w_cmd(0x4B)  # Query current file on TF/SD card (0x4C would be USB storage - wrong)
 
 def parse_uart_response():
     """Parse responses from SV5W player."""
@@ -68,8 +68,8 @@ def parse_uart_response():
                     para_h = data[5]
                     para_l = data[6]
                     
-                    # Response to query current track (0x4C)
-                    if cmd == 0x4C:
+                    # Response to query current track on TF/SD card (0x4B)
+                    if cmd == 0x4B:
                         track_num = (para_h << 8) | para_l
                         return track_num
         except:
