@@ -6,12 +6,14 @@
 
 | Button | GPIO Pin | Physical Pin | Function | Description |
 |--------|----------|--------------|----------|-------------|
-| **BTN 1** | GP16 | Pin 21 | **Play Random** | Picks random track from choreography library |
-| **BTN 2** | GP17 | Pin 22 | **Next Track** | Play next track sequentially |
-| **BTN 3** | GP18 | Pin 24 | **Previous** | Play previous track |
-| **BTN 4** | GP19 | Pin 25 | **Pause/Resume** | Pause current track or resume playback |
-| **BTN 5** | GP20 | Pin 26 | **Volume Up** | Increase speaker volume |
-| **BTN 6** | GP21 | Pin 27 | **Volume Down** | Decrease speaker volume |
+| **BTN 1** | GP18 | Pin 24 | **Play Random** | Picks random track from choreography library |
+| **BTN 2** | GP19 | Pin 25 | **Next Track** | Play next track sequentially |
+| **BTN 3** | GP20 | Pin 26 | **Previous** | Play previous track |
+| **BTN 4** | GP21 | Pin 27 | **Pause/Resume** | Pause current track or resume playback |
+| **BTN 5** | GP22 | Pin 29 | **Volume Up** | Increase speaker volume |
+| **BTN 6** | GP26 | Pin 31 | **Volume Down** | Decrease speaker volume |
+
+> ⚠️ **GP16 (Pin 21) and GP17 (Pin 22) are used for UART TX/RX to the SV5W — do NOT connect buttons to these pins.**
 
 ---
 
@@ -23,7 +25,7 @@ Each button has 2 terminals:
 
 **Example for Button 1:**
 ```
-Button 1 Terminal 1 → GP16 (Pin 21)
+Button 1 Terminal 1 → GP18 (Pin 24)
 Button 1 Terminal 2 → GND Rail on PCB
 ```
 

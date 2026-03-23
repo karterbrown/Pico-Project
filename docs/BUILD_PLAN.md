@@ -48,21 +48,21 @@
    - Speaker → SPK+/SPK-
 
 7. **Connect SV5W UART (Pico ↔ SV5W)**
-   - GP8 (Pin 11) **TX out** → **IO1 / RXD** (SV5W serial receive input)
-   - GP9 (Pin 12) **RX in** ← **IO0 / TXD** (SV5W serial transmit output)
+   - GP16 (Pin 21) **TX out** → **IO1 / RXD** (SV5W serial receive input)
+   - GP17 (Pin 22) **RX in** ← **IO0 / TXD** (SV5W serial transmit output)
    - GP5 (Pin 7) **input** ← **BUSY** (high while playing)
-   - ⚠️ **GP6/GP7 are UART1 CTS/RTS on RP2040 — they cannot be used as TX/RX. Use GP8/GP9 instead.**
    - ⚠️ TX and RX **must be crossed** — Pico TX → SV5W RX, SV5W TX → Pico RX.
    - ⚠️ At least one seller has noted the SV5W datasheet has **VCC and GND reversed**. Trust the **PCB silkscreen** for power pin orientation, not the datasheet.
    - Default UART baud rate: **9600**.
 
 8. **Connect Control Buttons (6 total)**
-   - Button 1 (Random): Terminal 1 → GP16 (Pin 21), Terminal 2 → GND rail
-   - Button 2 (Next): Terminal 1 → GP17 (Pin 22), Terminal 2 → GND rail
-   - Button 3 (Previous): Terminal 1 → GP18 (Pin 24), Terminal 2 → GND rail
-   - Button 4 (Pause): Terminal 1 → GP19 (Pin 25), Terminal 2 → GND rail
-   - Button 5 (Vol Up): Terminal 1 → GP20 (Pin 26), Terminal 2 → GND rail
-   - Button 6 (Vol Down): Terminal 1 → GP21 (Pin 27), Terminal 2 → GND rail
+   - Button 1 (Random): Terminal 1 → GP18 (Pin 24), Terminal 2 → GND rail
+   - Button 2 (Next): Terminal 1 → GP19 (Pin 25), Terminal 2 → GND rail
+   - Button 3 (Previous): Terminal 1 → GP20 (Pin 26), Terminal 2 → GND rail
+   - Button 4 (Pause): Terminal 1 → GP21 (Pin 27), Terminal 2 → GND rail
+   - Button 5 (Vol Up): Terminal 1 → GP22 (Pin 29), Terminal 2 → GND rail
+   - Button 6 (Vol Down): Terminal 1 → GP26 (Pin 31), Terminal 2 → GND rail
+   - ⚠️ **GP16/GP17 are used for UART TX/RX — do NOT connect buttons to these pins**
 
 9. **Configure SV5W DIP Switches for UART Mode**
    - See DIP_SWITCH_CONFIG.md for full details.
@@ -78,7 +78,7 @@
    - [ ] No shorts between +5V and GND
    - [ ] All 5 LED data connections correct
    - [ ] All 6 buttons wired
-   - [ ] SV5W UART connections (GP8 TX→IO1/RXD, GP9 RX←IO0/TXD, GP5←BUSY)
+   - [ ] SV5W UART connections (GP16 TX→IO1/RXD, GP17 RX←IO0/TXD, GP5←BUSY)
    - [ ] SV5W DIP switches set for UART mode
    - [ ] SD card inserted in SV5W
    - [ ] Power switch in OFF position

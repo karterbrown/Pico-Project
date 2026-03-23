@@ -75,7 +75,7 @@ SW3: OFF
 ### After setting DIP switches:
 
 1. **Power cycle the module** (remove and reconnect power)
-2. Connect Pico via UART (GP4→I01/RX, GP5→I00/TX)
+2. Connect Pico via UART (GP16 TX→IO1/RXD, GP17 RX←IO0/TXD)
 3. Send test command via serial: `play track 1`
 4. **If it works:** DIP switches correct! ✅
 5. **If nothing happens:** Check SW1 is ON, SW2 is OFF
@@ -87,7 +87,7 @@ SW3: OFF
 | Module doesn't respond to UART | SW1 is OFF | Set SW1 to ON, power cycle |
 | Only trigger pins work | SW2 is ON | Set SW2 to OFF, power cycle |
 | Random playback issues | Wrong SW3 configuration | Reset SW3 to OFF, test |
-| Module plays but Pico can't control | UART wires wrong | Check GP4→RX, GP5→TX |
+| Module plays but Pico can't control | UART wires wrong | Check GP16→IO1/RXD, GP17←IO0/TXD |
 
 ---
 
