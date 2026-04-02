@@ -1,552 +1,525 @@
-from machine import Pin, UART  # type: ignore
-from neopixel import NeoPixel  # type: ignore
-from time import sleep, ticks_ms, ticks_diff
+# ============================================================
+# Pico Light Show
+# 5 x NeoPixel strips on GP0-GP4, 20 LEDs each
+# Strips 2 (GP2) and 4 (GP4) are physically REVERSED
+#
+# Buttons (active-low, internal pull-up):
+#   GP16  Play/Pause      GP17  Prev track
+#   GP18  Next track      GP19  Random color + effect
+#   GP20  Volume down     GP21  Volume up
+# Audio: DFPlayer Mini on UART1  GP8=TX  GP9=RX  GP5=BUSY
+# ============================================================
+
+from neopixel import NeoPixel   # type: ignore
+from machine  import Pin, UART  # type: ignore
+from time     import sleep, ticks_ms, ticks_diff
 import math
-import sys
-import struct
+import urandom
 
-# Effect index list — must match tools/lights_tool.py EFFECTS order
-EFFECTS = ["strobe", "flash", "pulse", "fade", "hold", "wave"]
-RECORD_SIZE = 12  # bytes: uint32 time_ms + uint8 strip + uint8 brightness + uint8 effect_idx + uint8 led_pos + uint32 duration_ms
+# =====================================================================
+# HARDWARE
+# =====================================================================
 
-# Strip colors — rotate across strips over time
-STRIP_COLORS = [
-    (0, 200, 255),   # Electric blue
-    (0, 60, 255),    # Blue
-    (148, 0, 211),   # Purple
-    (255, 200, 0),   # Yellow
-    (0, 200, 50),    # Green
-]
-COLOR_ROTATE_MS = 10000  # Shift color assignment every 10 seconds
+N       = 20
+NSTRIPS = 5
+REV     = {2, 4}   # physically reversed strips
 
-# Boot delay - gives MicroPico/REPL time to connect and interrupt before the loop starts
-sleep(3)
-
-# Onboard LED solid ON = Pico is powered and running
+strips  = [NeoPixel(Pin(i), N) for i in range(NSTRIPS)]
 onboard = Pin("LED", Pin.OUT)
 onboard.on()
 
-# 5 WS2812B strips, 20 LEDs each
-# Using GP0, GP1, GP2, GP3, GP4 for LED strips
-NUM_LEDS = 20
-strips = [NeoPixel(Pin(i), NUM_LEDS) for i in range(5)]
+_btns     = [Pin(p, Pin.IN, Pin.PULL_UP) for p in (16, 17, 18, 19, 20, 21)]
+_bprev    = [True] * 6
+_btime    = [0]    * 6
+_DEBOUNCE = 50
 
-# ---- SV5W Audio Player Setup ----
-# UART0: GP16 TX → SV5W IO0/RXD, GP17 RX ← SV5W IO1/TXD
-uart = UART(0, baudrate=9600, tx=Pin(16), rx=Pin(17))
-busy = Pin(5, Pin.IN)  # LOW = playing, HIGH = idle
+# =====================================================================
+# GLOBAL STATE
+# =====================================================================
 
-# Track current playing song
-current_song_number = None
-_last_query_time = 0
-QUERY_INTERVAL_MS = 500  # Query current track every 500ms
+_brightness = 0.7
+_eff_idx    = 0
+_pat_idx    = 0
+_theme_idx  = 0
+_t_effect   = 0
+_paused     = False
 
-def sv5w_cmd(cmd, msb=0, lsb=0):
-    """Send a command to the SV5W in DFPlayer-style protocol."""
-    # Checksum includes VER byte: -(VER + LEN + CMD + Feedback + Para1 + Para2)
-    checksum = (-(0xFF + 0x06 + cmd + 0x00 + msb + lsb)) & 0xFFFF
-    chk_h = (checksum >> 8) & 0xFF
-    chk_l = checksum & 0xFF
-    msg = bytes([0x7E, 0xFF, 0x06, cmd, 0x00, msb, lsb, chk_h, chk_l, 0xEF])
-    uart.write(msg)
-    sleep(0.1)
+# =====================================================================
+# DFPLAYER MINI
+# =====================================================================
 
-def query_current_track():
-    """Query the current playing track number from SV5W."""
-    sv5w_cmd(0x4B)  # Query current file on TF/SD card (0x4C would be USB storage - wrong)
+_DFPLAYER_VOLUME = 20    # 0-30
+_track_count     = 2     # number of tracks on SD card
+_track_idx       = 1     # currently playing track (1-indexed)
+_busy_prev       = True  # last BUSY pin state (HIGH = idle)
+_last_play_ms    = 0     # ticks_ms() when dfp_play() was last called
 
-def parse_uart_response():
-    """Parse responses from SV5W player."""
-    if uart.any():
-        try:
-            # Read available bytes
-            data = uart.read()
-            if data and len(data) >= 8:
-                # DFPlayer response format: 0x7E FF 06 [CMD] [FeedBack] [ParaH] [ParaL] 0xEF
-                if data[0] == 0x7E and data[1] == 0xFF and len(data) >= 10:
-                    cmd = data[3]
-                    para_h = data[5]
-                    para_l = data[6]
-                    
-                    # Response to query current track on TF/SD card (0x4B)
-                    if cmd == 0x4B:
-                        track_num = (para_h << 8) | para_l
-                        return track_num
-        except:
-            pass
-    return None
+_uart = UART(1, baudrate=9600, tx=Pin(8), rx=Pin(9))
+_busy = Pin(5, Pin.IN, Pin.PULL_UP)
 
-def player_play():
-    sv5w_cmd(0x0D)
-    print("[AUDIO] Play / Resume")
+def _dfp_send(cmd, p1=0, p2=0):
+    inner = [0xFF, 0x06, cmd, 0x00, p1, p2]
+    cs    = (-sum(inner)) & 0xFFFF
+    _uart.write(bytes([0x7E] + inner + [(cs >> 8) & 0xFF, cs & 0xFF, 0xEF]))
+    sleep(0.05)
 
-def player_pause():
-    sv5w_cmd(0x0E)
-    print("[AUDIO] Pause")
+def dfp_init():
+    sleep(1.5)
+    _dfp_send(0x0C)                        # reset
+    sleep(1.5)
+    _dfp_send(0x06, 0, _DFPLAYER_VOLUME)  # set volume
 
-def player_next():
-    sv5w_cmd(0x01)
-    print("[AUDIO] Next track")
-
-def player_prev():
-    sv5w_cmd(0x02)
-    print("[AUDIO] Previous track")
-
-def player_random():
-    sv5w_cmd(0x18)
-    print("[AUDIO] Random track")
-
-def player_vol_up():
-    sv5w_cmd(0x04)
-    print("[AUDIO] Volume Up")
-
-def player_vol_down():
-    sv5w_cmd(0x05)
-    print("[AUDIO] Volume Down")
-
-def player_set_vol(level):
-    sv5w_cmd(0x06, 0x00, max(0, min(30, level)))
-    print("[AUDIO] Volume set to", level)
-
-# ---- Button Setup (GP18-GP22 + GP26, active LOW with PULL_UP) ----
-BUTTONS = {
-    "Random":   Pin(18, Pin.IN, Pin.PULL_UP),
-    "Next":     Pin(19, Pin.IN, Pin.PULL_UP),
-    "Previous": Pin(20, Pin.IN, Pin.PULL_UP),
-    "Pause":    Pin(21, Pin.IN, Pin.PULL_UP),
-    "Vol Up":   Pin(22, Pin.IN, Pin.PULL_UP),
-    "Vol Down": Pin(26, Pin.IN, Pin.PULL_UP),
-}
-
-BUTTON_ACTIONS = {
-    "Random":   player_random,
-    "Next":     player_next,
-    "Previous": player_prev,
-    "Pause":    player_pause,
-    "Vol Up":   player_vol_up,
-    "Vol Down": player_vol_down,
-}
-_last_press = {name: 0 for name in BUTTONS}
-DEBOUNCE_MS = 300
-
-def check_buttons():
-    """Check all buttons and fire their action on press. Call inside LED loops."""
-    now = ticks_ms()
-    for name, pin in BUTTONS.items():
-        if pin.value() == 0 and ticks_diff(now, _last_press[name]) > DEBOUNCE_MS:
-            _last_press[name] = now
-            print(f"[BTN] {name} pressed")
-            BUTTON_ACTIONS[name]()
+def dfp_play(n):   _dfp_send(0x03, 0, n)
+def dfp_next():    _dfp_send(0x01)
+def dfp_prev():    _dfp_send(0x02)
+def dfp_pause():   _dfp_send(0x0E)
+def dfp_resume():  _dfp_send(0x0D)
+def dfp_vol_up():  _dfp_send(0x04)
+def dfp_vol_dn():  _dfp_send(0x05)
 
 
 # =====================================================================
-# LIGHTING EVENT PLAYBACK ENGINE
+# COLOR HELPERS
 # =====================================================================
 
-class StripState:
-    """Track the state of a single LED strip's current effect"""
-    def __init__(self):
-        self.effect = None
-        self.brightness = 0
-        self.color = (255, 255, 255)
-        self.led_pos = 255  # 255 = whole strip, 0-19 = specific LED
-        self.start_time = 0
-        self.duration = 0
-        self.active = False
+def _c(r, g, b, s=1.0):
+    s = max(0.0, min(1.0, s)) * _brightness
+    return (int(r * s), int(g * s), int(b * s))
 
-    def start_effect(self, effect, brightness, duration, current_time, color=(255, 255, 255), led_pos=255):
-        """Start a new effect on this strip"""
-        self.effect = effect
-        self.brightness = brightness
-        self.color = color
-        self.led_pos = led_pos
-        self.start_time = current_time
-        self.duration = duration
-        self.active = True
-    
-    def update(self, strip, current_time):
-        """Update strip LEDs based on current effect state"""
-        if not self.active:
-            return
-        
-        elapsed = ticks_diff(current_time, self.start_time)
-        
-        # Check if effect is done
-        if elapsed >= self.duration:
-            self.active = False
-            strip.fill((0, 0, 0))
-            strip.write()
-            return
-        
-        # Calculate progress (0.0 to 1.0)
-        progress = elapsed / self.duration if self.duration > 0 else 1.0
-        
-        # Apply effect
-        if self.effect == "strobe":
-            self._effect_strobe(strip, elapsed)
-        elif self.effect == "flash":
-            self._effect_flash(strip, progress)
-        elif self.effect == "pulse":
-            self._effect_pulse(strip, progress)
-        elif self.effect == "fade":
-            self._effect_fade(strip, progress)
-        elif self.effect == "hold":
-            self._effect_hold(strip, progress)
-        elif self.effect == "wave":
-            self._effect_wave(strip, current_time, elapsed)
-        else:
-            # Default to flash
-            self._effect_flash(strip, progress)
-        
-        strip.write()
-    
-    def _scale_color(self, factor):
-        """Scale strip color by factor (0.0-1.0) and event brightness"""
-        r, g, b = self.color
-        f = factor * (self.brightness / 255.0)
-        return (int(r * f), int(g * f), int(b * f))
+def _add(a, b):
+    return (min(255, a[0]+b[0]), min(255, a[1]+b[1]), min(255, a[2]+b[2]))
 
-    def _set_leds(self, strip, color):
-        """Light specific LED(s) based on led_pos. 255 = fill whole strip."""
-        if self.led_pos == 255:
-            strip.fill(color)
-        else:
-            strip.fill((0, 0, 0))
-            # Light target LED plus soft neighbors for a natural look
-            for offset in range(-2, 3):
-                idx = self.led_pos + offset
-                if 0 <= idx < NUM_LEDS:
-                    fade = 1.0 if offset == 0 else (0.4 if abs(offset) == 1 else 0.1)
-                    r, g, b = color
-                    strip[idx] = (int(r * fade), int(g * fade), int(b * fade))
+def _px(si, i):
+    return (N - 1 - i) if si in REV else i
 
-    def _effect_strobe(self, strip, elapsed):
-        """Rapid on/off — hard cut between full color and black"""
-        if (elapsed // 40) % 2 == 0:
-            self._set_leds(strip, self._scale_color(1.0))
-        else:
-            strip.fill((0, 0, 0))
+def _write_all():
+    for s in strips: s.write()
 
-    def _effect_flash(self, strip, progress):
-        """Instant peak then sharp decay"""
-        fade = max(0, 1.0 - (progress ** 0.5))
-        self._set_leds(strip, self._scale_color(fade))
+def _fill_all(col):
+    for s in strips: s.fill(col)
+    _write_all()
 
-    def _effect_pulse(self, strip, progress):
-        """Smooth sine wave in and out"""
-        pulse = math.sin(progress * math.pi)
-        self._set_leds(strip, self._scale_color(pulse))
+def _fill_strip(si, col):
+    strips[si].fill(col)
+    strips[si].write()
 
-    def _effect_fade(self, strip, progress):
-        """Linear fade out from full brightness"""
-        self._set_leds(strip, self._scale_color(1.0 - progress))
+def _set(si, i, col):
+    strips[si][_px(si, i)] = col
 
-    def _effect_hold(self, strip, progress):
-        """Hold at full brightness, then quick fade at the end"""
-        if progress < 0.75:
-            self._set_leds(strip, self._scale_color(1.0))
-        else:
-            fade = (1.0 - progress) / 0.25
-            self._set_leds(strip, self._scale_color(fade))
+def _h(n):
+    s = int(n) & 0xFFFFFFFF
+    s = ((s >> 16) ^ s) * 0x45d9f3b & 0xFFFFFFFF
+    s = ((s >> 16) ^ s) * 0x45d9f3b & 0xFFFFFFFF
+    return ((s >> 16) ^ s) & 0xFF
 
-    def _effect_wave(self, strip, current_time, elapsed):
-        """Color wave chasing across the strip"""
-        wave_speed = 0.15
-        # Anchor wave around led_pos if set, else free-running
-        center = self.led_pos if self.led_pos != 255 else (elapsed * wave_speed) % NUM_LEDS
-        wave_pos = (center + elapsed * wave_speed) % NUM_LEDS
-        strip.fill((0, 0, 0))
-        for i in range(NUM_LEDS):
-            dist = abs(i - wave_pos)
-            if dist > NUM_LEDS / 2:
-                dist = NUM_LEDS - dist
-            brightness_factor = max(0, 1.0 - (dist / 4.0))
-            strip[i] = self._scale_color(brightness_factor)
+# =====================================================================
+# COLOR THEMES
+# =====================================================================
+# Each theme: 6 colour values [c0..c5]
+# c0=primary  c1=alt  c2=accent  c3=dark  c4=mid  c5=bright
+
+THEMES = [
+    [(0,60,255),(168,0,255),(0,220,255),(0,20,80),(0,140,200),(200,200,255)],
+    [(255,30,0),(255,130,0),(255,220,0),(80,0,0),(180,60,0),(255,200,80)],
+    [(0,180,220),(0,80,200),(0,255,200),(0,20,60),(0,120,160),(180,240,255)],
+    [(0,200,40),(0,140,60),(180,255,0),(0,40,10),(0,160,80),(200,255,120)],
+    [(255,0,160),(200,0,255),(0,255,200),(60,0,60),(180,0,180),(255,180,255)],
+    [(140,200,255),(200,240,255),(255,255,255),(10,30,60),(80,160,220),(220,240,255)],
+    [(255,10,0),(255,80,0),(255,255,80),(50,0,0),(160,30,0),(255,160,40)],
+    [(0,255,100),(0,200,255),(255,0,200),(0,40,20),(0,160,120),(180,255,200)],
+    [(255,60,0),(255,0,100),(200,0,255),(60,0,20),(200,40,60),(255,180,120)],
+    [(60,0,200),(200,0,255),(255,200,0),(10,0,40),(100,0,160),(220,180,255)],
+]
+
+def T(n): return THEMES[_theme_idx][n]
+
+THEME_NAMES = ['Electric','Fire','Ocean','Forest','Neon',
+               'Ice','Lava','Cyber','Sunset','Galaxy']
+
+SNAKE_LEN = N * NSTRIPS   # 100
 
 
-class LightingPlayer:
-    """Manages playback of lighting events streamed from binary file"""
-    def __init__(self, strips):
-        self.strips = strips
-        self.strip_states = [StripState() for _ in range(len(strips))]
-        self._file = None
-        self._next_event = None
-        self.playing = False
-        self.start_time = 0
+# =====================================================================
+# EFFECTS  (0-9)
+# Each function receives t_ms = time since pattern last started.
+# _pat_idx (0-19) selects sub-parameters within the effect.
+# =====================================================================
 
-    def open_file(self, filename):
-        """Open a binary events file for streaming playback"""
-        if self._file:
-            self._file.close()
-            self._file = None
-        try:
-            self._file = open(filename, 'rb')
-            self._next_event = self._read_next()
-            import os as _os
-            count = _os.stat(filename)[6] // RECORD_SIZE
-            print(f"[LIGHT] Opened {filename} ({count} events)")
-            return True
-        except Exception as e:
-            print(f"[LIGHT] Error opening {filename}: {e}")
-            return False
+# ── Effect 0: Lightning Strike ─────────────────────────────────────
+def eff_lightning(t):
+    p   = _pat_idx
+    fr  = t // 30
+    for si in range(NSTRIPS):
+        strips[si].fill(_c(*T(3), 0.25))
+    leaders_tbl = [(0,4),(1,3),(0,1,3,4),(0,2,4),(1,2,3)]
+    support_tbl = [(1,3),(0,2,4),(2,),(1,3),(0,4)]
+    leaders  = leaders_tbl[p % 5]
+    support  = support_tbl[p % 5]
+    br_shift = (p // 5) * 0.15
+    for si in leaders:
+        head = _h(fr * 7 + si * 13) % N
+        for i in range(N):
+            dist = (i - head) % N
+            if dist < 5:
+                f   = ((5 - dist) / 5.0) ** 1.8 * (0.8 + br_shift)
+                col = T(2) if _h(fr*3+i) > 200 else T(0)
+                _set(si, i, _c(*col, f))
+        for sp in range(6):
+            sv = _h(fr * 19 + sp * 11 + si * 7)
+            if sv > 190:
+                pos = _h(fr * 23 + sp * 7 + si * 3) % N
+                _set(si, pos, _c(*T(5), (sv-190)/65.0))
+    for si in support:
+        head2 = _h(fr * 5 + si * 17 + 50) % N
+        for i in range(N):
+            dist = (i - head2) % N
+            if dist < 3:
+                f = ((3 - dist) / 3.0) ** 2.0 * (0.45 + br_shift)
+                _set(si, i, _c(*T(1), f))
+    if _h(fr * 41) > 248:
+        _fill_all(_c(*T(5), 1.0))
+        sleep(0.018)
+        return
+    _write_all()
 
-    def _read_next(self):
-        """Read the next event record from the binary file"""
-        if not self._file:
-            return None
-        data = self._file.read(RECORD_SIZE)
-        if len(data) < RECORD_SIZE:
-            return None
-        time_ms, strip_index, brightness, effect_idx, led_pos, duration_ms = struct.unpack('<IBBBBI', data)
-        effect = EFFECTS[effect_idx] if effect_idx < len(EFFECTS) else "flash"
-        return (time_ms, strip_index, brightness, effect, duration_ms, led_pos)
 
-    def start(self):
-        """Start playback from beginning"""
-        if self.playing:
-            print("[LIGHT] Already playing")
-            return
-        if not self._file:
-            print("[LIGHT] No events file loaded")
-            return
-        self._file.seek(0)
-        self._next_event = self._read_next()
-        self.playing = True
-        self.start_time = ticks_ms()
-        print("[LIGHT] Playback started")
-        for strip in self.strips:
-            strip.fill((0, 0, 0))
-            strip.write()
+# ── Effect 1: Snake Chase ──────────────────────────────────────────
+def eff_snake(t):
+    p        = _pat_idx
+    speed    = max(20, 80 - (p % 10) * 6)
+    tail_len = 8 + (p // 10) * 6
+    count    = 1 + (1 if p % 5 > 2 else 0)
+    reverse  = (p % 4 >= 2)
+    for si in range(NSTRIPS): strips[si].fill((0, 0, 0))
+    for snake_n in range(count):
+        offset   = (SNAKE_LEN // max(count, 2)) * snake_n
+        head_pos = ((t // speed) + offset) % SNAKE_LEN
+        if reverse: head_pos = (SNAKE_LEN - 1 - head_pos) % SNAKE_LEN
+        for j in range(tail_len):
+            pos = (head_pos - j) % SNAKE_LEN if not reverse else (head_pos + j) % SNAKE_LEN
+            f   = ((tail_len - j) / tail_len) ** 1.6
+            col = T(2) if j == 0 else (T(0) if j < tail_len // 2 else T(3))
+            si2 = pos // N
+            li  = pos % N
+            px  = _px(si2, li)
+            strips[si2][px] = _add(strips[si2][px], _c(*col, f))
+    _write_all()
 
-    def stop(self):
-        """Stop playback"""
-        self.playing = False
-        if self._file:
-            self._file.seek(0)
-            self._next_event = self._read_next()
-        for strip in self.strips:
-            strip.fill((0, 0, 0))
-            strip.write()
-        print("[LIGHT] Playback stopped")
 
-    def update(self):
-        """Update all strips - call this in main loop"""
-        if not self.playing:
-            return
-
-        current_time = ticks_ms()
-        playback_time = ticks_diff(current_time, self.start_time)
-
-        # Rotate color assignment across strips over time
-        color_offset = (playback_time // COLOR_ROTATE_MS) % len(STRIP_COLORS)
-
-        # Process any events that should trigger now
-        while self._next_event is not None:
-            event_time, strip_index, brightness, effect, duration, led_pos = self._next_event
-            if event_time <= playback_time:
-                if 0 <= strip_index < len(self.strip_states):
-                    color = STRIP_COLORS[(strip_index + color_offset) % len(STRIP_COLORS)]
-                    self.strip_states[strip_index].start_effect(
-                        effect, brightness, duration, current_time, color, led_pos
-                    )
-                self._next_event = self._read_next()
+# ── Effect 2: Pulse Wave ───────────────────────────────────────────
+def eff_pulse(t):
+    p      = _pat_idx
+    speed  = 800 + (p % 5) * 200
+    width  = 0.3 + (p // 5) * 0.15
+    invert = (p % 2 == 1)
+    phase  = (t % speed) / speed
+    for si in range(NSTRIPS):
+        for i in range(N):
+            norm   = i / (N - 1.0)
+            dist   = abs(norm - 0.5)
+            wave_d = abs(dist - phase)
+            if wave_d < width:
+                f = (1.0 - wave_d / width) ** 2
+                if invert: f = 1.0 - f
             else:
-                break
-
-        # Update all active effects
-        for i, state in enumerate(self.strip_states):
-            if state.active:
-                state.update(self.strips[i], current_time)
-
-        # Check if playback is complete
-        if self._next_event is None:
-            if not any(state.active for state in self.strip_states):
-                print("[LIGHT] Playback complete")
-                self.playing = False
+                f = 0.02 if not invert else 0.9
+            _set(si, i, _c(*(T(0) if i < N // 2 else T(1)), f))
+        strips[si].write()
+    af = math.sin((t % (speed*2))/(speed*2) * math.pi * 2) * 0.5 + 0.5
+    for si in (0, 4):
+        for i in range(N):
+            px = _px(si, i)
+            strips[si][px] = _add(strips[si][px], _c(*T(2), af * 0.4))
+        strips[si].write()
 
 
-# Create lighting player
-player = LightingPlayer(strips)
+# ── Effect 3: Meteor Shower ────────────────────────────────────────
+def eff_meteor(t):
+    p         = _pat_idx
+    speed     = max(15, 35 + (p % 5) * 12)
+    tail      = 7 + (p // 5) * 3
+    n_meteors = 2 + (p % 3)
+    paired    = (p % 2 == 1)
+    for si in range(NSTRIPS): strips[si].fill((0, 0, 0))
+    spacing = SNAKE_LEN // n_meteors
+    for m in range(n_meteors):
+        head = ((t // speed) + m * spacing) % SNAKE_LEN
+        for j in range(tail):
+            pos = (head - j) % SNAKE_LEN
+            f   = ((tail - j) / tail) ** 2.0
+            col = T(5) if j == 0 else (T(0) if j < 3 else T(3))
+            si2 = pos // N
+            li  = pos % N
+            px  = _px(si2, li)
+            strips[si2][px] = _add(strips[si2][px], _c(*col, f))
+        if paired:
+            mh = (SNAKE_LEN - 1 - ((t // speed) + m * spacing)) % SNAKE_LEN
+            for j in range(tail):
+                pos = (mh + j) % SNAKE_LEN
+                f   = ((tail - j) / tail) ** 2.0
+                si2 = pos // N
+                li  = pos % N
+                px  = _px(si2, li)
+                strips[si2][px] = _add(strips[si2][px], _c(*T(1), f*0.6))
+    _write_all()
 
-# Load song mapping configuration
-try:
-    from song_config import get_events_for_song  # type: ignore
-    print("[CONFIG] Song mapping loaded")
-except ImportError:
-    print("[CONFIG] No song_config.py found - using default events")
-    def get_events_for_song(song_number):
-        return "events"
+
+# ── Effect 4: Fire ─────────────────────────────────────────────────
+def eff_fire(t):
+    p      = _pat_idx
+    fr     = t // (18 + (p % 5) * 4)
+    height = 0.5 + (p // 5) * 0.15
+    c0, c1, c2 = T(0), T(1), T(2)
+    for si in range(NSTRIPS):
+        for i in range(N):
+            bh   = max(0.0, height - (i / N) * 0.9)
+            noise= _h(fr * 7 + i * 3 + si * 11) / 255.0 * 0.35
+            heat = min(1.0, bh + noise)
+            if heat > 0.75:   col = _c(*c2, heat)
+            elif heat > 0.45: col = _c(*c1, heat)
+            elif heat > 0.15: col = _c(*c0, heat * 0.8)
+            else:             col = (0, 0, 0)
+            _set(si, i, col)
+        for sp in range(3):
+            sv = _h(fr * 13 + sp * 17 + si * 5)
+            if sv > 210:
+                pos = N - 1 - (_h(fr * 23 + sp * 7 + si) % (N // 3))
+                _set(si, pos, _c(*c2, (sv - 210) / 45.0))
+        strips[si].write()
 
 
-def load_events_for_song(song_number):
-    """
-    Open binary events file and start playback for the given song number.
-    Binary files are named <number>.bin (e.g. 00001.bin).
-    """
-    event_module_name = get_events_for_song(song_number)
+# ── Effect 5: Strobe ───────────────────────────────────────────────
+_STROBE_PERIODS = (60,80,100,120,150,60,80,100,60,80,50,70,90,110,130,55,75,95,65,85)
+_STROBE_GROUPS  = [
+    (0,4),(1,3),(0,1,3,4),(0,2,4),(1,2,3),
+    (0,4),(0,1,2,3,4),(1,3),(0,2,4),(0,1,2,3,4),
+    (0,4),(1,3),(2,),(0,1,3,4),(0,2,4),
+    (0,1,2,3,4),(0,4),(1,2,3),(0,1,3,4),(2,),
+]
 
-    if event_module_name is None:
-        print(f"[LIGHT] Song {song_number}: No lights configured")
-        player.stop()
-        return False
-
-    # Derive binary filename: "00001_events" → "00001.bin"
-    bin_filename = event_module_name.replace('_events', '') + '.bin'
-
-    if player.open_file(bin_filename):
-        player.start()
-        return True
+def eff_strobe(t):
+    p      = _pat_idx
+    period = _STROBE_PERIODS[p]
+    on     = (t % period) < (period // 3)
+    groups = _STROBE_GROUPS[p]
+    rest   = [s for s in range(NSTRIPS) if s not in groups]
+    c_on   = T(0) if (t // 500) % 2 == 0 else T(1)
+    if on:
+        for si in groups: _fill_strip(si, _c(*c_on, 1.0))
+        for si in rest:   _fill_strip(si, _c(*T(3), 0.15))
     else:
-        print(f"[LIGHT] Song {song_number}: Could not load {bin_filename}")
-        return False
+        for si in rest:   _fill_strip(si, _c(*T(3), 0.08))
+        for si in groups: _fill_strip(si, (0, 0, 0))
 
 
-def check_song_change():
-    """
-    Monitor current playing song and auto-start lights when song changes
-    """
-    global current_song_number, _last_query_time
-    
-    now = ticks_ms()
-    
-    # Query current track periodically
-    if ticks_diff(now, _last_query_time) > QUERY_INTERVAL_MS:
-        _last_query_time = now
-        query_current_track()
-    
-    # Check for response
-    track_num = parse_uart_response()
-    
-    if track_num is not None and track_num > 0:
-        # Song change detected
-        if track_num != current_song_number:
-            print(f"\n[AUDIO] Track changed: {current_song_number} → {track_num}")
-            current_song_number = track_num
-            
-            # Stop current light show
-            player.stop()
-            
-            # Load and start new light show for this song
-            load_events_for_song(current_song_number)
+# ── Effect 6: Breathing ────────────────────────────────────────────
+def eff_breathe(t):
+    p      = _pat_idx
+    period = 1200 + (p % 5) * 400
+    if p % 5 == 2:
+        groups  = [(0,1,2,3,4)]; offsets = [0.0]; cols = [T(0)]
+    elif p % 5 in (0, 1):
+        groups  = [(0,4),(1,3),(2,)]; offsets = [0.0,0.33,0.66]; cols = [T(0),T(1),T(2)]
+    elif p % 5 == 3:
+        groups  = [(0,4),(1,2,3)]; offsets = [0.0,0.5]; cols = [T(0),T(1)]
+    else:
+        groups  = [(0,2,4),(1,3)]; offsets = [0.0,0.5]; cols = [T(0),T(2)]
+    for gi, grp in enumerate(groups):
+        ph    = ((t % period) / period + offsets[gi]) % 1.0
+        local = math.sin(ph * math.pi) ** 2
+        col   = cols[gi % len(cols)]
+        for si in grp:
+            for i in range(N):
+                _set(si, i, _c(*col, local * (1.0 - (i / N) * 0.45)))
+            strips[si].write()
+
+
+# ── Effect 7: Rainbow ──────────────────────────────────────────────
+def eff_rainbow(t):
+    p      = _pat_idx
+    speed  = 2000 + (p % 5) * 600
+    spread = 0.5 + (p // 5) * 0.17
+    rev    = (p % 4 >= 2)
+    phase  = (t % speed) / speed
+    if rev: phase = 1.0 - phase
+    def _hsv(h):
+        h = h % 1.0; idx = int(h * 6); f = h*6 - idx; q = 1.0 - f
+        segs = [(1,f,0),(q,1,0),(0,1,f),(0,q,1),(f,0,1),(1,0,q)]
+        r,g,b = segs[idx % 6]; return (int(r*255), int(g*255), int(b*255))
+    for pos in range(SNAKE_LEN):
+        col = _hsv((pos / SNAKE_LEN * spread + phase) % 1.0)
+        si  = pos // N; li = pos % N
+        strips[si][_px(si, li)] = _c(*col, 1.0)
+    _write_all()
+
+
+# ── Effect 8: Sparkle ──────────────────────────────────────────────
+def eff_sparkle(t):
+    p       = _pat_idx
+    fr      = t // 30
+    density = 0.15 + (p % 5) * 0.08
+    decay_f = 1.0 - 0.08 * (1 + (p // 5) * 0.7)
+    for si in range(NSTRIPS):
+        for i in range(N):
+            seed = fr * 7 + i * 3 + si * 11
+            if _h(seed) / 255.0 < density:
+                _set(si, i, _c(*T(_h(seed * 3) % 3), 1.0))
+            else:
+                px = _px(si, i)
+                r,g,b = strips[si][px]
+                strips[si][px] = (int(r*decay_f), int(g*decay_f), int(b*decay_f))
+        strips[si].write()
+
+
+# ── Effect 9: Cascade Fill / Drain ────────────────────────────────
+def eff_cascade(t):
+    p      = _pat_idx
+    period = 1500 + (p % 5) * 300
+    phase  = (t % (period * 2)) / (period * 2)
+    frac   = min(1.0, phase*2) if phase < 0.5 else max(0.0, 1.0-(phase-0.5)*2)
+    ftop   = (p % 2 == 1)
+    for si in range(NSTRIPS):
+        fc  = int(frac * N)
+        col = T(0) if si in (0, 2, 4) else T(1)
+        for i in range(N):
+            lit = (i >= N - fc) if ftop else (i < fc)
+            if lit:
+                edge = (N - fc) if ftop else (fc - 1)
+                near = abs(i - edge) if fc > 0 else N
+                _set(si, i, _c(*(T(2) if near == 0 else col), 1.0 if near < 2 else 0.75))
+            else:
+                _set(si, i, _c(*T(3), _h(t//80 + i*3 + si*7)/255.0 * 0.06))
+        strips[si].write()
+    for si in (0, 4):
+        fc   = int(frac * N)
+        edge = (N - fc) if ftop else (fc - 1)
+        if 0 <= edge < N:
+            _set(si, edge, _c(*T(5), 1.0))
+        strips[si].write()
 
 
 # =====================================================================
-# TEST MODE - Demonstrates all effects on all strips
+# EFFECT TABLE
 # =====================================================================
 
-def test_mode():
-    """Run test mode showing all effects on all strips"""
-    print("\n=== TEST MODE ===")
-    print("Demonstrating all effects on all strips\n")
-    
-    effects = ["strobe", "flash", "pulse", "fade", "hold", "wave"]
-    test_brightness = 200
-    
-    for effect in effects:
-        print(f"Testing: {effect}")
-        
-        # Show effect on all strips simultaneously
-        for i in range(5):
-            player.strip_states[i].start_effect(effect, test_brightness, 2000, ticks_ms())
-        
-        # Run for 2 seconds
-        start = ticks_ms()
-        while ticks_diff(ticks_ms(), start) < 2000:
-            current_time = ticks_ms()
-            for i, state in enumerate(player.strip_states):
-                state.update(strips[i], current_time)
-            check_buttons()
-            sleep(0.01)
-        
-        # Clear
-        for strip in strips:
-            strip.fill((0, 0, 0))
-            strip.write()
-        
-        sleep(0.3)
-    
-    # Individual strip test
-    print("\nTesting individual strips")
-    for i in range(5):
-        print(f"Strip {i} (GP{i})")
-        strips[i].fill((100, 100, 100))
-        strips[i].write()
-        sleep(0.5)
-        strips[i].fill((0, 0, 0))
-        strips[i].write()
-        sleep(0.2)
-    
-    print("\n=== TEST MODE COMPLETE ===\n")
+EFFECTS = [
+    (eff_lightning, "Lightning"),
+    (eff_snake,     "Snake Chase"),
+    (eff_pulse,     "Pulse Wave"),
+    (eff_meteor,    "Meteor"),
+    (eff_fire,      "Fire"),
+    (eff_strobe,    "Strobe"),
+    (eff_breathe,   "Breathe"),
+    (eff_rainbow,   "Rainbow"),
+    (eff_sparkle,   "Sparkle"),
+    (eff_cascade,   "Cascade"),
+]
+N_EFFECTS  = len(EFFECTS)
+N_PATTERNS = 20
 
 
 # =====================================================================
-# LEGACY CHASE EFFECTS (for testing/demo)
+# BUTTONS
 # =====================================================================
 
-def clear_all():
-    for s in strips:
-        s.fill((0, 0, 0))
-        s.write()
+def _poll_buttons():
+    global _brightness, _eff_idx, _pat_idx, _theme_idx, _t_effect
+    now    = ticks_ms()
+    action = None
+    for idx in range(6):
+        state = bool(_btns[idx].value())
+        if (not state) and _bprev[idx]:
+            if ticks_diff(now, _btime[idx]) > _DEBOUNCE:
+                _btime[idx] = now
+                action = ('play_pause','prev_track','next_track',
+                          'rand_color_eff','vol_dn','vol_up')[idx]
+        _bprev[idx] = state
+    return action
 
 
-# ---- Startup ----
-print("\n" + "="*50)
-print("Auto-Sync MIDI Lighting Controller")
-print("="*50)
-print("\nControls:")
-print("  GP18 = Random track")
-print("  GP19 = Next track")
-print("  GP20 = Previous track")
-print("  GP21 = Pause/Play")
-print("  GP22 = Volume Up")
-print("  GP26 = Volume Down")
-print("\nLED Strips: GP0, GP1, GP2, GP3, GP4")
-print("\nLights auto-start when songs change!")
-print("Configure mappings in song_config.py")
-print("="*50 + "\n")
+def _apply_action(action):
+    global _paused, _eff_idx, _pat_idx, _theme_idx, _t_effect, _track_idx
+    if action == 'play_pause':
+        if _paused:
+            dfp_resume()
+            _paused = False
+            print("Resumed")
+        else:
+            dfp_pause()
+            _paused = True
+            print("Paused")
+    elif action == 'prev_track':
+        _track_idx = (_track_idx - 2) % _track_count + 1
+        dfp_play(_track_idx)
+        _paused = False
+        _last_play_ms = ticks_ms()
+        print("Track:", _track_idx)
+    elif action == 'next_track':
+        _track_idx = (_track_idx % _track_count) + 1
+        dfp_play(_track_idx)
+        _paused = False
+        _last_play_ms = ticks_ms()
+        print("Track:", _track_idx)
+    elif action == 'rand_color_eff':
+        _theme_idx = urandom.randint(0, len(THEMES) - 1)
+        _eff_idx   = urandom.randint(0, N_EFFECTS - 1)
+        _pat_idx   = urandom.randint(0, N_PATTERNS - 1)
+        _t_effect  = ticks_ms()
+        print("Random:", THEME_NAMES[_theme_idx], "+", EFFECTS[_eff_idx][1])
+    elif action == 'vol_dn':
+        dfp_vol_dn()
+        print("Vol -")
+    elif action == 'vol_up':
+        dfp_vol_up()
+        print("Vol +")
 
-# Uncomment to run test mode on startup:
-# test_mode()
 
-# Init SV5W: reset, wait for it to boot, then set volume and play track 1
-print("[AUDIO] Initialising SV5W...")
-sv5w_cmd(0x0C)          # Reset
-sleep(3)                # Wait for module to fully boot and read SD card
-player_set_vol(25)
-sleep(0.2)
-sv5w_cmd(0x03, 0x00, 1) # Play track 1 explicitly
-sleep(0.2)
-# Read any response to confirm
-if uart.any():
-    resp = uart.read()
-    print(f"[AUDIO] SV5W response: {list(resp) if resp else 'empty'}")
-else:
-    print("[AUDIO] No response from SV5W — check wiring/power")
+# =====================================================================
+# MAIN LOOP
+# =====================================================================
 
-print("[AUDIO] Starting playback...")
-print("[LIGHT] Monitoring for song changes...\n")
+PAT_DURATION = 8000   # ms before pattern auto-advances
 
-# Auto-start song 1 light show immediately (SV5W will sync once connected)
-load_events_for_song(1)
+_t_effect = ticks_ms()
 
-# Main loop
-try:
-    while True:
-        # Monitor for song changes and auto-start lights
-        check_song_change()
-        
-        # Check audio control buttons
-        check_buttons()
-        
-        # Update lighting player
-        player.update()
-        
-        # Small delay to prevent CPU spinning
-        sleep(0.01)
+print("Pico Light Show -- starting audio")
+dfp_init()
+dfp_play(_track_idx)
+_last_play_ms = ticks_ms()
+print("Playing track", _track_idx)
 
-except KeyboardInterrupt:
-    clear_all()
-    player.stop()
-    player_pause()
-    onboard.off()
-    print("\nStopped.")
+print("Pico Light Show -- ready")
+print("Effect:", EFFECTS[_eff_idx][1],
+      "| Pattern:", _pat_idx,
+      "| Color:", THEME_NAMES[_theme_idx])
+
+while True:
+    now  = ticks_ms()
+    t_ms = ticks_diff(now, _t_effect)
+
+    if t_ms >= PAT_DURATION:
+        _pat_idx  = (_pat_idx + 1) % N_PATTERNS
+        _t_effect = now
+        t_ms      = 0
+
+    EFFECTS[_eff_idx][0](t_ms)
+
+    act = _poll_buttons()
+    if act:
+        _apply_action(act)
+
+    # Auto-advance when current track ends (BUSY goes HIGH).
+    # Guard: skip if paused, or within 3s of a play command (race condition
+    # -- some DFPlayer firmware briefly pulls BUSY HIGH on track change).
+    busy_now = bool(_busy.value())
+    if (busy_now and not _busy_prev
+            and not _paused
+            and ticks_diff(now, _last_play_ms) > 3000):
+        _track_idx = (_track_idx % _track_count) + 1
+        dfp_play(_track_idx)
+        _last_play_ms = ticks_ms()
+        print("Auto-next track:", _track_idx)
+    _busy_prev = busy_now
+
+    sleep(0.016)
+
